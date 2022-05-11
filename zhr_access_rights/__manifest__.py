@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Alemlaq Additional Access Rights',
+    'name': 'ZHR Access Rights',
     'category': 'Sales',
     'sequence': 1,
     'version': '15.0.1',
     'license': 'LGPL-3',
-    'summary': """Alemlaq Additional Access Rights""",
-    'description': """Alemlaq Additional Access Rights""",
+    'summary': """ZHR Access Rights""",
+    'description': """ZHR Access Rights""",
     'author': 'Aneesh.AV',
-    'depends': ['product', 'stock','stock'],
+    'depends': ['product', 'stock', 'stock'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
