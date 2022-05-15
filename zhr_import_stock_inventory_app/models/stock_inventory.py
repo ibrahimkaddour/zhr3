@@ -127,3 +127,4 @@ class StockValuationLayer(models.Model):
             # Eventually reconcile together the invoice and valuation accounting entries on the stock interim accounts
             if svl.company_id.anglo_saxon_accounting:
                 svl.stock_move_id._get_related_invoices()._stock_account_anglo_saxon_reconcile_valuation(product=svl.product_id)
+
