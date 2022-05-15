@@ -17,8 +17,10 @@ class ProductProduct(models.Model):
         """
         # Handle stock valuation layers.
 
-        if self.filtered(lambda p: p.valuation == 'real_time') and not self.env['stock.valuation.layer'].check_access_rights('read', raise_exception=False):
-            raise UserError(_("You cannot update the cost of a product in automated valuation as it leads to the creation of a journal entry, for which you don't have the access rights."))
+        if self.filtered(lambda p: p.valuation == 'real_time') and not self.env[
+            'stock.valuation.layer'].check_access_rights('read', raise_exception=False):
+            raise UserError(
+                _("You cannot update the cost of a product in automated valuation as it leads to the creation of a journal entry, for which you don't have the access rights."))
 
         svl_vals_list = []
         company_id = self.env.company
@@ -32,13 +34,14 @@ class ProductProduct(models.Model):
             value = company_id.currency_id.round(quantity_svl * diff)
             if company_id.currency_id.is_zero(value):
                 continue
-
             svl_vals = {
                 'company_id': company_id.id,
                 'product_id': product.id,
-                'description': _('Product value manually modified (from %s to %s)') % (product.standard_price, new_price),
+                'description': _('Product value manually modified (from %s to %s)') % (
+                    product.standard_price, new_price),
                 'value': value,
                 'quantity': 0,
+                'create_date': self._context.get('inventory_date') or fields.Date.today()
             }
             svl_vals_list.append(svl_vals)
         stock_valuation_layers = self.env['stock.valuation.layer'].sudo().create(svl_vals_list)
@@ -59,7 +62,8 @@ class ProductProduct(models.Model):
             if not product_accounts[product.id].get('expense'):
                 raise UserError(_('You must set a counterpart account on your product category.'))
             if not product_accounts[product.id].get('stock_valuation'):
-                raise UserError(_('You don\'t have any stock valuation account defined on your product category. You must define one before processing this operation.'))
+                raise UserError(
+                    _('You don\'t have any stock valuation account defined on your product category. You must define one before processing this operation.'))
 
             if value < 0:
                 debit_account_id = product_accounts[product.id]['expense'].id
@@ -74,6 +78,8 @@ class ProductProduct(models.Model):
                 'ref': product.default_code,
                 'stock_valuation_layer_ids': [(6, None, [stock_valuation_layer.id])],
                 'move_type': 'entry',
+                'date': self._context.get('inventory_date') or fields.Date.today(),
+                'create_date': self._context.get('inventory_date') or fields.Date.today(),
                 'line_ids': [(0, 0, {
                     'name': _(
                         '%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s',
@@ -115,16 +121,36 @@ class StockValuationLayer(models.Model):
             return True
         am_vals = []
         for svl in self:
+
             if not svl.product_id.valuation == 'real_time':
                 continue
             if svl.currency_id.is_zero(svl.value):
                 continue
+
             am_vals += svl.stock_move_id._account_entry_move(svl.quantity, svl.description, svl.id, svl.value)
         if am_vals:
             account_moves = self.env['account.move'].sudo().create(am_vals)
+            if self._context.get('inventory_date'):
+                for mov in account_moves:
+                    mov.write({'date': self._context.get('inventory_date')})
+                    for line in mov.line_ids:
+                        line.write({'date': self._context.get('inventory_date')})
+
             account_moves._post()
         for svl in self:
             # Eventually reconcile together the invoice and valuation accounting entries on the stock interim accounts
             if svl.company_id.anglo_saxon_accounting:
-                svl.stock_move_id._get_related_invoices()._stock_account_anglo_saxon_reconcile_valuation(product=svl.product_id)
+                svl.stock_move_id._get_related_invoices()._stock_account_anglo_saxon_reconcile_valuation(
+                    product=svl.product_id)
 
+            if svl._context.get('inventory_date'):
+                svl.stock_move_id.write({'date': svl._context.get('inventory_date')})
+                if svl.stock_move_id:
+                    svl.env.cr.execute("UPDATE stock_move set date=%s,create_date=%s WHERE id=%s",
+                                        (svl._context.get('inventory_date'), svl._context.get('inventory_date'),
+                                         svl.stock_move_id.id))
+                    svl.env.cr.execute("UPDATE stock_move_line set date=%s,create_date=%s WHERE move_id=%s", (
+                        svl._context.get('inventory_date'), svl._context.get('inventory_date'),
+                        svl.stock_move_id.id))
+                svl.env.cr.execute("UPDATE stock_valuation_layer set create_date=%s WHERE id=%s",
+                                    (svl._context.get('inventory_date'), svl.id))
