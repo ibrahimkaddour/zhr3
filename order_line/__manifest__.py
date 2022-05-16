@@ -9,7 +9,6 @@
 
     ],
     'assets': {
-
     },
     'installable': True,
     'application': False,

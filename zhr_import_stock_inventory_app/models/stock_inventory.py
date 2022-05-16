@@ -144,13 +144,18 @@ class StockValuationLayer(models.Model):
                     product=svl.product_id)
 
             if svl._context.get('inventory_date'):
-                svl.stock_move_id.write({'date': svl._context.get('inventory_date')})
-                if svl.stock_move_id:
-                    svl.env.cr.execute("UPDATE stock_move set date=%s,create_date=%s WHERE id=%s",
-                                        (svl._context.get('inventory_date'), svl._context.get('inventory_date'),
-                                         svl.stock_move_id.id))
-                    svl.env.cr.execute("UPDATE stock_move_line set date=%s,create_date=%s WHERE move_id=%s", (
-                        svl._context.get('inventory_date'), svl._context.get('inventory_date'),
-                        svl.stock_move_id.id))
-                svl.env.cr.execute("UPDATE stock_valuation_layer set create_date=%s WHERE id=%s",
-                                    (svl._context.get('inventory_date'), svl.id))
+                svl.stock_move_id.sudo().write({'date': svl._context.get('inventory_date')})
+                svl.stock_move_id.move_line_ids.sudo().write({'date': svl._context.get('inventory_date')})
+                # if svl.stock_move_id:
+                #     svl.env.cr.execute("UPDATE stock_move set date=%s,create_date=%s WHERE id=%s",
+                #                         (svl._context.get('inventory_date'), svl._context.get('inventory_date'),
+                #                          svl.stock_move_id.id))
+                #     svl.env.cr.execute("UPDATE stock_move_line set date=%s,create_date=%s WHERE move_id=%s", (
+                #         svl._context.get('inventory_date'), svl._context.get('inventory_date'),
+                #         svl.stock_move_id.id))
+                # svl.env.cr.execute("UPDATE stock_valuation_layer set create_date=%s WHERE id=%s",
+                #                    (svl._context.get('inventory_date'), svl.id))
+                for layer in self.env['stock.valuation.layer'].search([('stock_move_id', '=', svl.stock_move_id.id)]):
+                    layer.sudo().write({'create_date': svl._context.get('inventory_date'),'date': svl._context.get('inventory_date')})
+                # svl.stock_move_id.move_line_ids.write({'date': svl._context.get('inventory_date')})
+                # svl.stock_move_id.move_line_ids.write({'date': svl._context.get('inventory_date')})
