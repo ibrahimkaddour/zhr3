@@ -25,6 +25,15 @@ class AccountMove(models.Model):
                 if not sequence:
                     raise UserError(_('Please define a sequence on your journal.'))
                 move.name = sequence.with_context(ir_sequence_date=move.date).next_by_id()
+                if move.journal_id.month_wise and move.journal_id.sequence_id.month_wise:
+                    if not move.invoice_date:
+                        raise ValidationError('Please add the Invoice Date')
+                    prefix = str(move.journal_id.sequence_id.prefix).split('/')
+                    if "%(range_month)s" in prefix:
+                        index = prefix.index('%(range_month)s')
+                        x = move.name.split('/')
+                        x[index] = str(move.invoice_date.month).zfill(2)
+                        move.name = '/'.join(x)
         res = super(AccountMove, self)._post(soft=True)
         return res
 
@@ -45,3 +54,9 @@ class AccountMove(models.Model):
                 lambda move: move.name != '/')._is_end_of_seq_chain():
             raise UserError(
                 _("You cannot delete this entry, as it has already consumed a sequence number and is not the last one in the chain. Probably you should revert it instead."))
+
+
+class IrSequence(models.Model):
+    _inherit = 'ir.sequence'
+
+    month_wise = fields.Boolean('Month Wise')

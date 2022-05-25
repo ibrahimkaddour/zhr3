@@ -11,6 +11,7 @@ class AccountJournal(models.Model):
                                   help="This field contains the information related to the numbering of the"
                                        " journal entries of this journal.",
                                   required=True, copy=False)
+    month_wise = fields.Boolean('Need Month Wise Sequence')
     sequence_number_next = fields.Integer(string='Next Number',
                                           help='The next sequence number will be used for the next invoice.',
                                           compute='_compute_seq_number_next',

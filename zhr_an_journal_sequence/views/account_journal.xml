@@ -11,6 +11,7 @@
                         <group string="Sequence">
                             <field name="sequence_number_next"/>
                             <field name="sequence_id" required="0" attrs="{'readonly': 1}"/>
+                            <field name="month_wise"/>
                             <button name="create_journal_sequence" string="Set Sequence" type="object" class="oe_highlight"
                                     attrs="{'invisible': [('sequence_id','!=',False),('refund_sequence_id','!=',False)]}"/>
                         </group>

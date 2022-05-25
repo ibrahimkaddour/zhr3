@@ -7,7 +7,7 @@
     'summary': 'Journal Sequence For Odoo 15',
     'sequence': '1',
     'author': 'Aneesh.AV',
-    'depends': ['account'],
+    'depends': ['account','base'],
     'demo': [],
     'data': [
         'data/account_data.xml',
