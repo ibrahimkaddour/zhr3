@@ -26,7 +26,7 @@
         <field name="model">purchase.approval.category</field>
         <field name="arch" type="xml">
             <tree string="Approval Category" editable='bottom'>
-                <field name='name' />
+                <field name='name'/>
             </tree>
         </field>
     </record>

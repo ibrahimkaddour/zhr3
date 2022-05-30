@@ -107,6 +107,7 @@ class SaleOrder(models.Model):
     def _get_data_sale_order_approval_rule_ids(self):
         values = []
         approval_rule = self.company_id.sale_order_approval_rule_id
+        print(approval_rule)
         for sale in self:
             if self.company_id.sale_order_approval and approval_rule.approval_rule_ids:
                 for rule in approval_rule.approval_rule_ids.sorted(key=lambda r: r.sequence):

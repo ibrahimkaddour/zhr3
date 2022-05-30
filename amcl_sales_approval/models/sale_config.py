@@ -19,6 +19,19 @@ class SaleOrderApprovalRule(models.Model):
     name = fields.Char(required=True)
     approval_rule_ids = fields.One2many('sale.order.approval.rule.lines', 'approval_rule_id', string='Approval Rule Lines')
 
+    def update_old_so(self):
+        for sale in self.env['sale.order'].search([('state','=','draft')]):
+            print('Sale :: ', sale)
+            values = sale._get_data_sale_order_approval_rule_ids()
+            print('Values :: ', values)
+            approval_roles = sale.sale_order_approval_rule_ids.mapped('approval_role')
+            for v in values:
+                if not v.get('approval_role') in approval_roles.ids:
+                    self.env['sale.order.approval.rules'].create(v)
+            for a in sale.sale_order_approval_rule_ids:
+                if a.approval_role.id not in map(lambda x: x['approval_role'], values):
+                    a.unlink()
+            sale.user_ids = [(6, 0, sale.sale_order_approval_rule_ids.mapped('users').ids)]
 
 class SaleOrderApprovalRuleLines(models.Model):
     _name = 'sale.order.approval.rule.lines'

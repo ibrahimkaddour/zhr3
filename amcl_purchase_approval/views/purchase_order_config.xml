@@ -36,6 +36,7 @@
                     <group>
                         <field name="name" />
                     </group>
+                    <button name="update_old_po" type="object" string="Update old PO" />
                     <group string='Approval Rules'>
                         <field name="approval_rule_ids" nolabel='1'>
                             <tree editable='bottom'>
