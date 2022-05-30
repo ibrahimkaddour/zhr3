@@ -95,7 +95,7 @@
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="supplier_rep_ids" widget="many2many_tags"/>
-                <field name="user_ids" widget="many2many_tags"/>
+                <field name="user_ids" widget="many2many_tags" invisible="1"/>
             </xpath>
         </field>
     </record>
