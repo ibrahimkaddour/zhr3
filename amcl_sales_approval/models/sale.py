@@ -189,8 +189,8 @@ class SaleOrder(models.Model):
             self.user_ids = [(6, 0, self.sale_order_approval_rule_ids.mapped('users').ids)]
         if self.user_ids:
             if self.env.user not in self.user_ids and not self._context.get('sale_approve') and (not
-                    self.user_has_groups('sale.group_sale_user') and not self.user_has_groups(
-                    'sale.group_sale_manager')):
+                    self.user_has_groups('sales_team.group_sale_salesman') and not self.user_has_groups(
+                    'sales_team.group_sale_manager')):
                 raise ValidationError(_("You can only edit your assigned Quotation."))
         return res
 
