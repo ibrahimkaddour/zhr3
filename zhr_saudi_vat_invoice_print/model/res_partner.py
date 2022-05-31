@@ -30,18 +30,21 @@ class res_partner(models.Model):
     def name_get(self):
         if self._context.get('partner_category_display') == 'short':
             return super(res_partner, self).name_get()
-
         res = []
         for category in self:
-            names = []
+
             current = category
-            while current:
-                if self.env.user.lang == 'en_US' or not current.arabic:
-                    names.append(current.name)
-                else:
-                    names.append(current.arabic)
-                current = current.parent_id
-            res.append((category.id, ' / '.join(reversed(names))))
+            if current:
+                names = []
+                while current:
+                    if (self.env.user.lang == 'en_US' or not current.arabic) and current.name:
+                        names.append(current.name)
+                    else:
+                        if current.arabic:
+                            names.append(current.arabic)
+                    current = current.parent_id
+                print('Names :: ', names)
+                res.append((category.id, ' / '.join(reversed(names))))
         return res
 
     @api.model
