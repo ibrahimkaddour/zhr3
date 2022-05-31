@@ -5,28 +5,61 @@ from lxml import etree
 
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
-
+from re import sub
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    purchase_order_approval_rule_ids = fields.One2many('purchase.order.approval.rules', 'purchase_order', string='Purchase Order Approval Lines', readonly=True, copy=False)
-    purchase_order_approval_history = fields.One2many('purchase.order.approval.history', 'purchase_order', string='Purchase Order Approval History', readonly=True, copy=False)
-    approve_button = fields.Boolean(compute='_compute_approve_button', string='Approve Button ?', search='_search_to_approve_orders', copy=False)
+    purchase_order_approval_rule_ids = fields.One2many('purchase.order.approval.rules', 'purchase_order',
+                                                       string='Purchase Order Approval Lines', readonly=True,
+                                                       copy=False)
+    purchase_order_approval_history = fields.One2many('purchase.order.approval.history', 'purchase_order',
+                                                      string='Purchase Order Approval History', readonly=True,
+                                                      copy=False)
+    approve_button = fields.Boolean(compute='_compute_approve_button', string='Approve Button ?',
+                                    search='_search_to_approve_orders', copy=False)
     ready_for_po = fields.Boolean(compute='_compute_ready_for_po', string='Ready For PO ?', copy=False)
     send_for_approval = fields.Boolean(string="Send For Approval", copy=False)
-    supplier_rep_ids = fields.Many2many('res.partner', 'supplier_purchase_rel', 'supplier_id', 'partner_id', string='Supplier Representatives')
+    supplier_rep_ids = fields.Many2many('res.partner', 'supplier_purchase_rel', 'supplier_id', 'partner_id',
+                                        string='Supplier Representatives')
     is_rejected = fields.Boolean(string='Rejected ?', copy=False)
     user_ids = fields.Many2many('res.users', 'purchase_user_rel', 'purchase_id', 'uid', string='Approval Users')
-    purchase_order_approval_rule_id = fields.Many2one('purchase.order.approval.rule', related='company_id.purchase_order_approval_rule_id', string='Purchase Order Approval Rules')
-    purchase_order_approval = fields.Boolean(related='company_id.purchase_order_approval', string='Purchase Order Approval By Rule')
+    purchase_order_approval_rule_id = fields.Many2one('purchase.order.approval.rule',
+                                                      related='company_id.purchase_order_approval_rule_id',
+                                                      string='Purchase Order Approval Rules')
+    purchase_order_approval = fields.Boolean(related='company_id.purchase_order_approval',
+                                             string='Purchase Order Approval By Rule')
+    next_approval_ids = fields.Many2many('res.users', string='Next Approval', compute='_compute_next_approvals',
+                                         store=True)
+    next_approval_status = fields.Char(string='Approval Status', compute='_compute_next_approvals', store=True)
+
+    def camel(s):
+        s = sub(r"(_|-)+", " ", s).title().replace(" ", "")
+        return ''.join([s[0].lower(), s[1:]])
+
+    @api.depends()
+    def _compute_next_approvals(self):
+        for purchase in self:
+            purchase.next_approval_ids = [(5, 0)]
+            if purchase.state == 'draft':
+                if not purchase.purchase_order_approval_rule_ids:
+                    purchase.next_approval_status = 'No Approvals'
+                if len(purchase.purchase_order_approval_rule_ids.filtered(lambda r: r.state == 'draft').sorted('sequence')) > 0:
+                    for rule in purchase.purchase_order_approval_rule_ids.filtered(lambda r: r.state == 'draft').sorted('sequence')[0]:
+                        purchase.next_approval_ids = [(6, 0, rule.mapped('users').ids)]
+                        purchase.next_approval_status = 'Waiting for ' + rule.approval_role.name
+            else:
+                print('here')
+                purchase.next_approval_status = self.camel(purchase.state)
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         res = super(PurchaseOrder, self).fields_view_get(
             view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
         doc = etree.XML(res['arch'])
-        if view_type in ['tree', 'form'] and (self.user_has_groups('purchase.group_purchase_user') and not self.user_has_groups('purchase.group_purchase_manager')):
+        if view_type in ['tree', 'form'] and (
+                self.user_has_groups('purchase.group_purchase_user') and not self.user_has_groups(
+                'purchase.group_purchase_manager')):
             if self._context.get('purchase_approve'):
                 for node in doc.xpath("//tree"):
                     node.set('create', 'false')
@@ -40,7 +73,8 @@ class PurchaseOrder(models.Model):
     def _search_to_approve_orders(self, operator, value):
         res = []
         for i in self.search([('purchase_order_approval_rule_ids', '!=', False)]):
-            approval_lines = i.purchase_order_approval_rule_ids.filtered(lambda b: not b.is_approved).sorted(key=lambda r: r.sequence)
+            approval_lines = i.purchase_order_approval_rule_ids.filtered(lambda b: not b.is_approved).sorted(
+                key=lambda r: r.sequence)
             if approval_lines:
                 same_seq_lines = approval_lines.filtered(lambda b: b.sequence == approval_lines[0].sequence)
                 if self.env.user in same_seq_lines.mapped('users') and i.send_for_approval:
@@ -51,7 +85,8 @@ class PurchaseOrder(models.Model):
     def _compute_approve_button(self):
         for rec in self:
             if rec.company_id.purchase_order_approval and rec.company_id.purchase_order_approval_rule_id:
-                approval_lines = rec.purchase_order_approval_rule_ids.filtered(lambda b: not b.is_approved).sorted(key=lambda r: r.sequence)
+                approval_lines = rec.purchase_order_approval_rule_ids.filtered(lambda b: not b.is_approved).sorted(
+                    key=lambda r: r.sequence)
                 if approval_lines:
                     same_seq_lines = approval_lines.filtered(lambda b: b.sequence == approval_lines[0].sequence)
                     if same_seq_lines:
@@ -70,10 +105,11 @@ class PurchaseOrder(models.Model):
     def _compute_ready_for_po(self):
         for rec in self:
             if rec.company_id.purchase_order_approval and rec.company_id.purchase_order_approval_rule_id:
-                    if all([i.is_approved for i in rec.purchase_order_approval_rule_ids]) and rec.purchase_order_approval_rule_ids:
-                        rec.ready_for_po = True
-                    else:
-                        rec.ready_for_po = False
+                if all([i.is_approved for i in
+                        rec.purchase_order_approval_rule_ids]) and rec.purchase_order_approval_rule_ids:
+                    rec.ready_for_po = True
+                else:
+                    rec.ready_for_po = False
             else:
                 rec.ready_for_po = True
 
@@ -82,7 +118,8 @@ class PurchaseOrder(models.Model):
             template_id = self.env.ref('amcl_purchase_approval.email_template_rfq_approved')
             if rec.purchase_order_approval_rule_ids:
                 rules = rec.purchase_order_approval_rule_ids.filtered(lambda b: self.env.user in b.users)
-                rules.write({'is_approved': True, 'state': 'approve', 'date': fields.Datetime.now(), 'user_id': self.env.user.id})
+                rules.write({'is_approved': True, 'state': 'approve', 'date': fields.Datetime.now(),
+                             'user_id': self.env.user.id})
                 msg = _("RFQ has been approved by %s.") % (self.env.user.name)
                 self.message_post(body=msg, subtype_xmlid='mail.mt_comment')
 
@@ -102,7 +139,7 @@ class PurchaseOrder(models.Model):
         if self.company_id.purchase_order_approval and approval_rule.approval_rule_ids:
             for rule in approval_rule.approval_rule_ids.sorted(key=lambda r: r.sequence):
                 if not rule.approval_category:
-                    if not(rule.purchase_lower_limit == -1 or rule.purchase_upper_limit == -1) and self.amount_total:
+                    if not (rule.purchase_lower_limit == -1 or rule.purchase_upper_limit == -1) and self.amount_total:
                         if rule.purchase_lower_limit <= self.amount_total and self.amount_total <= rule.purchase_upper_limit:
                             values.append({
                                 'sequence': rule.sequence,
@@ -126,10 +163,11 @@ class PurchaseOrder(models.Model):
                                 'purchase_order': self.id,
                             })
                 if rule.approval_category:
-                    rule_approval_category_order_lines = self.order_line.filtered(lambda b: b.product_id.approval_category == rule.approval_category)
+                    rule_approval_category_order_lines = self.order_line.filtered(
+                        lambda b: b.product_id.approval_category == rule.approval_category)
                     if rule_approval_category_order_lines:
                         subtotal = sum(rule_approval_category_order_lines.mapped('price_subtotal'))
-                        if not(rule.purchase_lower_limit == -1 or rule.purchase_upper_limit == -1):
+                        if not (rule.purchase_lower_limit == -1 or rule.purchase_upper_limit == -1):
                             if rule.purchase_lower_limit <= subtotal and subtotal <= rule.purchase_upper_limit:
                                 values.append({
                                     'sequence': rule.sequence,
@@ -176,10 +214,29 @@ class PurchaseOrder(models.Model):
             for a in self.purchase_order_approval_rule_ids:
                 if a.approval_role.id not in map(lambda x: x['approval_role'], values):
                     a.unlink()
+
             self.user_ids = [(6, 0, self.purchase_order_approval_rule_ids.mapped('users').ids)]
         if self.user_ids:
-            if self.env.user not in self.user_ids and not self._context.get('purchase_approve') and (not self.user_has_groups('purchase.group_purchase_user') and not self.user_has_groups('purchase.group_purchase_manager')):
+            if self.env.user not in self.user_ids and not self._context.get('purchase_approve') and (
+                    not self.user_has_groups('purchase.group_purchase_user') and not self.user_has_groups(
+                    'purchase.group_purchase_manager')):
                 raise ValidationError(_("You can only edit your assigned RFQ."))
+        return res
+
+    def button_draft(self):
+        res = super(PurchaseOrder, self).button_draft()
+        self.purchase_order_approval_rule_ids = [(5, 0)]
+        for purchase in self:
+            values = purchase._get_data_purchase_order_approval_rule_ids()
+            approval_roles = purchase.purchase_order_approval_rule_ids.mapped('approval_role')
+            for v in values:
+                if not v.get('approval_role') in approval_roles.ids:
+                    self.env['purchase.order.approval.rules'].create(v)
+            for a in purchase.purchase_order_approval_rule_ids:
+                if a.approval_role.id not in map(lambda x: x['approval_role'], values):
+                    a.unlink()
+            purchase.user_ids = [(6, 0, purchase.purchase_order_approval_rule_ids.mapped('users').ids)]
+            purchase._compute_next_approvals()
         return res
 
     def reject_purchase(self):
@@ -238,10 +295,10 @@ class PurchaseOrderApprovalRules(models.Model):
     user_id = fields.Many2one('res.users', string='User')
     is_approved = fields.Boolean(string='Approved ?')
     state = fields.Selection([
-            ('approve', 'Approved'),
-            ('reject', 'Reject'),
-            ('draft', 'Draft')
-        ], string='Status', index=True, readonly=True, default='draft')
+        ('approve', 'Approved'),
+        ('reject', 'Reject'),
+        ('draft', 'Draft')
+    ], string='Status', index=True, readonly=True, default='draft')
 
     @api.depends('approval_role')
     def _compute_users(self):
@@ -265,7 +322,8 @@ class PurchaseRejectionReason(models.TransientModel):
             order = self.env['purchase.order'].browse(self.env.context['active_id'])
             if order.purchase_order_approval_rule_ids:
                 rules = order.purchase_order_approval_rule_ids.filtered(lambda b: self.env.user in b.users)
-                rules.write({'is_approved': False, 'date': fields.Datetime.now(), 'state': 'reject', 'user_id': self.env.user.id})
+                rules.write({'is_approved': False, 'date': fields.Datetime.now(), 'state': 'reject',
+                             'user_id': self.env.user.id})
                 msg = _("RFQ has been rejected by %s.") % (self.env.user.name)
                 order.message_post(body=msg, subtype_xmlid='mail.mt_comment')
                 template_id.send_mail(order.id, force_send=True)

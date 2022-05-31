@@ -95,6 +95,8 @@
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="supplier_rep_ids" widget="many2many_tags"/>
+                <field name="next_approval_ids" widget="many2many_tags"/>
+                <field name="next_approval_status"/>
                 <field name="user_ids" widget="many2many_tags" invisible="1"/>
             </xpath>
         </field>
@@ -104,7 +106,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">purchase.order</field>
         <field name="context">{'purchase_approve': True}</field>
-        <field name="domain">[]</field>
+        <field name="domain">[('next_approval_ids','in', uid)]</field>
         <field name="view_mode">tree,form,graph,calendar</field>
         <field name="search_view_id" ref="purchase.view_purchase_order_filter" />
         <field name="help" type="html">
@@ -122,6 +124,41 @@
             </p>
         </field>
     </record>
+    <record id="purchase_order_kpis_tree" model="ir.ui.view">
+        <field name="name">purchase.order.tree</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="next_approval_ids" widget="many2many_tags" />
+                <field name="next_approval_status"/>
+            </xpath>
+        </field>
+    </record>
+        <record id="purchase_order_view_tree" model="ir.ui.view">
+        <field name="name">purchase.order.tree1</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="next_approval_ids" widget="many2many_tags" />
+                <field name="next_approval_status"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="purchase_order_tree" model="ir.ui.view">
+        <field name="name">purchase.order.tree2</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+               <field name="next_approval_ids" widget="many2many_tags"/>
+                <field name="next_approval_status"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <record id="view_purchase_rejection_reason_form" model="ir.ui.view">
         <field name="name">purchase.rejection.reason.form</field>
         <field name="model">purchase.rejection.reason</field>
