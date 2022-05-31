@@ -33,10 +33,6 @@ class PurchaseOrder(models.Model):
                                          store=True)
     next_approval_status = fields.Char(string='Approval Status', compute='_compute_next_approvals', store=True)
 
-    def camel(s):
-        s = sub(r"(_|-)+", " ", s).title().replace(" ", "")
-        return ''.join([s[0].lower(), s[1:]])
-
     @api.depends()
     def _compute_next_approvals(self):
         for purchase in self:
@@ -49,8 +45,8 @@ class PurchaseOrder(models.Model):
                         purchase.next_approval_ids = [(6, 0, rule.mapped('users').ids)]
                         purchase.next_approval_status = 'Waiting for ' + rule.approval_role.name
             else:
-                print('here')
-                purchase.next_approval_status = self.camel(purchase.state)
+                s = sub(r"(_|-)+", " ", purchase.state).title().replace(" ", "")
+                purchase.next_approval_status = ''.join([s[0].lower(), s[1:]])
 
     @api.model
     def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
