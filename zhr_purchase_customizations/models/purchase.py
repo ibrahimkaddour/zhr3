@@ -8,11 +8,11 @@ class PurchaseOrder(models.Model):
 
     active = fields.Boolean("Active", default=True)
 
-    def toggle_active(self):
-        if not self.active:
-            self.active = True
-
-    def toggle_archive(self):
-        if self.active:
-            self.active = False
+    # def toggle_active(self):
+    #     if not self.active:
+    #         self.active = True
+    #
+    # def toggle_archive(self):
+    #     if self.active:
+    #         self.active = False
 

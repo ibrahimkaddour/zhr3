@@ -18,33 +18,33 @@
     <!--        </field>-->
     <!--    </record>-->
 
-    <record id="purchase_order_view_form_inherit" model="ir.ui.view">
-        <field name="name">purchase.order.form.inherit</field>
-        <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase.purchase_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-                <field name="active" invisible="1"/>
-                <!--                attrs="{'invisible':[('active', '=', True)]}"-->
-                <button name="toggle_active" type="object"
-                        class="oe_stat_button" icon="fa-check-square"
-                        style="color:green; font-size:15px;"
-                        string="Active" widget="boolean_button"
-                        groups="purchase.group_purchase_manager"
-                        invisible="1"
-                />
-                <!--                attrs="{'invisible':[('active', '=', False)]}"-->
-                <button name="toggle_archive" type="object"
-                        class="oe_stat_button" icon="fa-exclamation-triangle"
-                        style="color:red; font-size:15px;"
-                        string="Archive" widget="boolean_button"
-                        groups="purchase.group_purchase_manager"
-                        invisible="1"
-                />
-            </xpath>
+<!--    <record id="purchase_order_view_form_inherit" model="ir.ui.view">-->
+<!--        <field name="name">purchase.order.form.inherit</field>-->
+<!--        <field name="model">purchase.order</field>-->
+<!--        <field name="inherit_id" ref="purchase.purchase_order_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">-->
+<!--                <field name="active" invisible="1"/>-->
+<!--                &lt;!&ndash;                attrs="{'invisible':[('active', '=', True)]}"&ndash;&gt;-->
+<!--                <button name="toggle_active" type="object"-->
+<!--                        class="oe_stat_button" icon="fa-check-square"-->
+<!--                        style="color:green; font-size:15px;"-->
+<!--                        string="Active" widget="boolean_button"-->
+<!--                        groups="purchase.group_purchase_manager"-->
+<!--                        invisible="1"-->
+<!--                />-->
+<!--                &lt;!&ndash;                attrs="{'invisible':[('active', '=', False)]}"&ndash;&gt;-->
+<!--                <button name="toggle_archive" type="object"-->
+<!--                        class="oe_stat_button" icon="fa-exclamation-triangle"-->
+<!--                        style="color:red; font-size:15px;"-->
+<!--                        string="Archive" widget="boolean_button"-->
+<!--                        groups="purchase.group_purchase_manager"-->
+<!--                        invisible="1"-->
+<!--                />-->
+<!--            </xpath>-->
 
-        </field>
-    </record>
+<!--        </field>-->
+<!--    </record>-->
 
     <record id="purchase_order_search_inherit" model="ir.ui.view">
         <field name="name">purchase.order.list.select.inherit</field>
