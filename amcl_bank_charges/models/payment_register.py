@@ -325,7 +325,7 @@ class AccountPayment(models.Model):
             move.write(move._cleanup_write_orm_values(move, move_vals_to_write))
             pay.write(move._cleanup_write_orm_values(pay, payment_vals_to_write))
 
-            if self.is_bank_charges and not move.line_ids.filtered(lambda e: e.bank_charge_line is True):
+            if pay.is_bank_charges and not move.line_ids.filtered(lambda e: e.bank_charge_line is True):
                 move.write({'line_ids': [
                     (0, 0, {
                         "name": 'Bank Charges',
