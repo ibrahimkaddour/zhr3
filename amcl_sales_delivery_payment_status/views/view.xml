@@ -32,7 +32,7 @@
         <field name="inherit_id" ref="sale.view_quotation_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_status']" position="before">
-                <field name="payments"/>
+                        <field name="payments"/>
                         <field name="deliveries"/>
             </xpath>
         </field>

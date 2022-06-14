@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="purchase_order_form_approval_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.approval</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/header/field[@name='state']" position="replace">
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,waiting_for_approval,waiting_for_approval_finance,waiting_for_approval_ceo,ready_to_confirm,sent,purchase"
+                           readonly="1"/>
+                </xpath>
+
+                <xpath expr="//header" position="inside">
+                    <button name="submit_for_approval" string="Submit for Approval" type="object" class="oe_highlight"
+                            states="draft,sent" groups="purchase.group_purchase_user"/>
+                    <button name="confirm_by_manager" string="Manager Approve" type="object" class="oe_highlight"
+                            states="waiting_for_approval"
+                            groups="amcl_purchase_order_approval.group_purchase_order_approval"/>
+                    <button name="confirm_by_finance" string="Finance Approve" type="object" class='oe_highlight'
+                            attrs="{'invisible': [('state', 'not in', ['waiting_for_approval_finance'])]}"
+                            groups="amcl_purchase_order_approval.group_purchase_order_finance"/>
+                    <button name="confirm_by_ceo" string="Approve" type="object" class='oe_highlight'
+                            attrs="{'invisible': [('state', 'not in', ['waiting_for_approval_ceo'])]}"
+                            groups="amcl_purchase_order_approval.group_purchase_order_ceo"/>
+                    <button name="button_confirm_po" string="Confirm" type="object" class='oe_highlight'
+                            attrs="{'invisible': [('state', 'not in', ['ready_to_confirm'])]}"
+                            groups="purchase.group_purchase_user"/>
+                    <button name="action_rfq_send" string="Send by Email" type="object" class='oe_highlight'
+                            attrs="{'invisible':[['state','!=','ready_to_confirm']]}"
+                            context="{'send_rfq':True}" data-hotkey="g"/>
+
+
+                </xpath>
+
+                <xpath expr="//form[1]/header[1]/button[@name='print_quotation'][1]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/header[1]/button[@name='print_quotation'][2]" position="attributes">
+                    <attribute name="state">ready_to_confirm</attribute>
+                </xpath>
+
+                <xpath expr="//form[1]/header[1]/button[@name='button_confirm'][1]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form[1]/header[1]/button[@name='button_confirm'][2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='action_rfq_send'][1]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_rfq_send'][2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//button[@name='button_cancel']" position="attributes">
+                    <attribute name="states">
+                        draft,sent,waiting_for_approval,waiting_for_approval_finance,waiting_for_approval_ceo,ready_to_confirm,to
+                        approve,sent,purchase
+                    </attribute>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='products']/field[@name='order_line']"
+                       position="attributes">
+                    <attribute name="attrs">{"readonly": [('state', 'in',
+                        ['purchase','cancel','waiting_for_approval','waiting_for_approval_finance','waiting_for_approval_ceo','ready_to_confirm'])]}
+                    </attribute>
+                </xpath>
+
+
+            </field>
+        </record>
+
+        <record id="view_purchase_order_filter" model="ir.ui.view">
+            <field name="name">view.inherit.purchase.order.search</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_purchases']" position="after">
+                    <separator/>
+                    <filter name="filter_waiting_for_approval" string="Waiting for Manager"
+                            domain="[('state','=','waiting_for_approval')]"/>
+                    <filter name="filter_waiting_for_ceo" string="Waiting for Finance"
+                            domain="[('state','=','waiting_for_approval_finance')]"/>
+                    <filter name="filter_waiting_for_ceo" string="Waiting for CEO"
+                            domain="[('state','=','waiting_for_approval_ceo')]"/>
+                    <filter name="filter_ready_to_confirm" string="Ready to Confirm"
+                            domain="[('state','=','ready_to_confirm')]"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
