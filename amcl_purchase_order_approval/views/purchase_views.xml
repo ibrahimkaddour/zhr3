@@ -66,7 +66,9 @@
                         ['purchase','cancel','waiting_for_approval','waiting_for_approval_finance','waiting_for_approval_ceo','ready_to_confirm'])]}
                     </attribute>
                 </xpath>
-
+                <xpath expr="//field[@name='partner_ref']" position="after">
+                    <field name="next_apporoval_user_ids" widget="many2many_tags" invisible="1"/>
+                </xpath>
 
             </field>
         </record>

@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Quotation (customer) approval request -->
+        <record id="email_template_quotation_approval_request" model="mail.template">
+            <field name="name">Quotation Approval Request</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Quotation Approval Request</field>
+            <field name="email_from">"{{ object.company_id.name }}" &lt;{{ (object.company_id.email or user.email) }}&gt;</field>
+            <!--            <field name="email_to">{{ object.next_apporoval_user_ids.email}}</field>-->
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="body_html" type="html">
+
+                <div>
+                    <table border="0" cellpadding="0" cellspacing="0"
+                           style="padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
+                        <tr>
+                            <td align="center">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                       style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+                                    <tbody>
+
+                                        <!-- CONTENT -->
+                                        <tr>
+                                            <td align="center" style="min-width: 590px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                                       style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                    <tr>
+                                                        <td valign="top" style="font-size: 13px;">
+                                                            <div>
+                                                                <p>Hello Manager(s),</p>
+                                                                <br/>
+                                                                <br/>
+                                                                <p>Hello Manager(s),</p>
+                                                                <p>Quotation approval
+                                                                    <strong t-out="object.name"/>
+                                                                    has been raised by<strong t-out="user.name"/>.
+                                                                    Please review and approve or
+                                                                    reject (with reason given) this quotation.
+                                                                </p>
+                                                                <br/>
+                                                                <div t-if="ctx.get('action_url')"
+                                                                     style="margin: 16px 0px 16px 0px;">
+                                                                    <a t-att-href="ctx.get('action_url')"
+                                                                       style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px;">
+                                                                        Approve/Reject
+                                                                    </a>
+                                                                </div>
+                                                                <br/>Thank you,
+                                                                <br/>
+                                                                <t t-if="user.signature">
+                                                                    <t t-out="user.signature or ''">
+                                                                    </t>
+                                                                </t>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;">
+                                                            <hr width="100%"
+                                                                style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <!-- FOOTER -->
+                                        <tr>
+                                            <td align="center" style="min-width: 590px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                                       style="min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                    <tr>
+                                                        <td valign="middle" align="left">
+                                                            <t t-out="object.company_id.name or ''">YourCompany</t>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td valign="middle" align="left" style="opacity: 0.7;">
+                                                            <t t-out="object.company_id.phone or ''">+1 650-123-4567</t>
+                                                            <t t-if="object.company_id.email">
+                                                                |
+                                                                <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}"
+                                                                   style="text-decoration:none; color: #454748;"
+                                                                   t-out="object.company_id.email or ''">
+                                                                    info@yourcompany.com
+                                                                </a>
+                                                            </t>
+                                                            <t t-if="object.company_id.website">
+                                                                |
+                                                                <a t-attf-href="'%s' % {{ object.company_id.website }}"
+                                                                   style="text-decoration:none; color: #454748;"
+                                                                   t-out="object.company_id.website or ''">
+                                                                    http://www.example.com
+                                                                </a>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+
+                    </table>
+
+
+                </div>
+
+
+            </field>
+        </record>
+
+        <record id="email_template_quotation_approval_ceo" model="mail.template">
+            <field name="name">Quotation Approval Request to CEO</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Quotation Approval Request to CEO</field>
+            <field name="email_from">"{{ object.company_id.name }}" &lt;{{ (object.company_id.email or user.email) }}&gt;</field>
+            <!--            <field name="email_to">{{ object.next_apporoval_user_ids.email}}</field>-->
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="body_html" type="html">
+
+                <div>
+                    <table border="0" cellpadding="0" cellspacing="0"
+                           style="padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
+                        <tr>
+                            <td align="center">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                       style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+                                    <tbody>
+
+                                        <!-- CONTENT -->
+                                        <tr>
+                                            <td align="center" style="min-width: 590px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                                       style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                    <tr>
+                                                        <td valign="top" style="font-size: 13px;">
+                                                            <div>
+                                                                <p>Hello Manager(s),</p>
+                                                                <br/>
+                                                                <br/>
+                                                                <p>Hello Sir,</p>
+
+                                                                <p>Quotation approval
+                                                                    <strong t-out="object.name"/>
+                                                                    has been raised by
+                                                                    <strong t-out="user.name"/>
+                                                                    . Please review and approve or
+                                                                    reject (with reason given) this quotation.
+                                                                </p>
+                                                                <br/>
+                                                                <div t-if="ctx.get('action_url')"
+                                                                     style="margin: 16px 0px 16px 0px;">
+                                                                    <a t-att-href="ctx.get('action_url')"
+                                                                       style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px;">
+                                                                        Approve/Reject
+                                                                    </a>
+                                                                </div>
+                                                                <br/>Thank you,
+                                                                <br/>
+                                                                <t t-if="user.signature">
+                                                                    <t t-out="user.signature or ''">
+                                                                    </t>
+                                                                </t>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;">
+                                                            <hr width="100%"
+                                                                style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <!-- FOOTER -->
+                                        <tr>
+                                            <td align="center" style="min-width: 590px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                                       style="min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                    <tr>
+                                                        <td valign="middle" align="left">
+                                                            <t t-out="object.company_id.name or ''">YourCompany</t>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td valign="middle" align="left" style="opacity: 0.7;">
+                                                            <t t-out="object.company_id.phone or ''">+1 650-123-4567</t>
+                                                            <t t-if="object.company_id.email">
+                                                                |
+                                                                <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}"
+                                                                   style="text-decoration:none; color: #454748;"
+                                                                   t-out="object.company_id.email or ''">
+                                                                    info@yourcompany.com
+                                                                </a>
+                                                            </t>
+                                                            <t t-if="object.company_id.website">
+                                                                |
+                                                                <a t-attf-href="'%s' % {{ object.company_id.website }}"
+                                                                   style="text-decoration:none; color: #454748;"
+                                                                   t-out="object.company_id.website or ''">
+                                                                    http://www.example.com
+                                                                </a>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+
+                    </table>
+
+
+                </div>
+
+
+            </field>
+        </record>
+
+
+        <!--Quotation (customer) approved -->
+        <record id="email_template_quotation_approved" model="mail.template">
+            <field name="name">Quotation Approved</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Quotation Approved</field>
+            <field name="email_from">{{user.email}}</field>
+            <field name="email_to">{{object.user_id.email}}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">{{object.partner_id.lang}}</field>
+            <field name="body_html" type="html">
+                <div>
+                    <table border="0" cellpadding="0" cellspacing="0"
+                           style="padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
+                        <tr>
+                            <td align="center">
+                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                       style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+                                    <tbody>
+
+                                        <!-- CONTENT -->
+                                        <tr>
+                                            <td align="center" style="min-width: 590px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                                       style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                    <tr>
+                                                        <td valign="top" style="font-size: 13px;">
+                                                            <div>
+                                                                <p>Hello Manager(s),</p>
+                                                                <br/>
+                                                                <br/>
+                                                                <p>Hello
+                                                                    <strong t-out="object.user_id.partner_id.name"/>,
+                                                                </p>
+
+                                                                <p>Quotation
+                                                                    <strong t-out="object.name"/>
+                                                                    has been approved by<strong
+                                                                            t-out="object.env.user.name"/>.
+                                                                    You may release the Quotation/Sale Order to the
+                                                                    customer.
+                                                                </p>
+                                                                <br/>
+                                                                <div t-if="ctx.get('action_url')"
+                                                                     style="margin: 16px 0px 16px 0px;">
+                                                                    <a t-att-href="ctx.get('action_url')"
+                                                                       style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px;">
+                                                                        Approve/Reject
+                                                                    </a>
+                                                                </div>
+                                                                <br/>Thank you,
+                                                                <br/>
+                                                                <t t-if="user.signature">
+                                                                    <t t-out="user.signature or ''">
+                                                                    </t>
+                                                                </t>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align:center;">
+                                                            <hr width="100%"
+                                                                style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <!-- FOOTER -->
+                                        <tr>
+                                            <td align="center" style="min-width: 590px;">
+                                                <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                                       style="min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                    <tr>
+                                                        <td valign="middle" align="left">
+                                                            <t t-out="object.company_id.name or ''">YourCompany</t>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td valign="middle" align="left" style="opacity: 0.7;">
+                                                            <t t-out="object.company_id.phone or ''">+1 650-123-4567</t>
+                                                            <t t-if="object.company_id.email">
+                                                                |
+                                                                <a t-attf-href="'mailto:%s' % {{ object.company_id.email }}"
+                                                                   style="text-decoration:none; color: #454748;"
+                                                                   t-out="object.company_id.email or ''">
+                                                                    info@yourcompany.com
+                                                                </a>
+                                                            </t>
+                                                            <t t-if="object.company_id.website">
+                                                                |
+                                                                <a t-attf-href="'%s' % {{ object.company_id.website }}"
+                                                                   style="text-decoration:none; color: #454748;"
+                                                                   t-out="object.company_id.website or ''">
+                                                                    http://www.example.com
+                                                                </a>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+
+                    </table>
+
+
+                </div>
+            </field>
+        </record>
+        <!--Quotation (customer) rejected -->
+        <record id="email_template_quotation_rejected" model="mail.template">
+            <field name="name">Quotation Rejected</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Quotation Rejected</field>
+            <field name="email_from">${user.email}</field>
+            <field name="email_to">${object.sale_order_approval_history[-1].user.email}</field>
+            <field name="email_to">
+                % for user in object.user_ids:
+                ${user.email},
+                %endfor
+            </field>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+                    <div style="height:auto; text-align: center; font-size: 30px; color: #29408c;">
+                        <strong style="border-bottom: 2px solid #29408c; padding-bottom: 1px; text-transform: uppercase;">
+                            Quotation Rejected
+                        </strong>
+                    </div>
+                    <div style="text-align: left; font-size: 20px; margin-top: 10px; color: #29408c;">
+                        <p>Hello ${object.sale_order_approval_history[-1].user.name},</p>
+
+                        <p>Quotation ${object.name} has been rejected by ${object.user_id.name}. Please review this with
+                            the
+                            approver and make changes to the record, then re-send for approval.
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

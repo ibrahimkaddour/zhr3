@@ -13,6 +13,7 @@
     'version': '1.0',
     'depends': ['base', 'purchase'],
     'data': [
+        'data/mail_template.xml',
         'security/security.xml',
         'views/purchase_views.xml',
     ],
