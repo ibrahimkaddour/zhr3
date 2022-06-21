@@ -77,8 +77,7 @@
                         <field name="customer_po" nolabel="1"
                                filename="customer_po_filename"
                                attrs="{'invisible': [('state', 'not in', ['ready_to_confirm', 'sale', 'done'])],
-                                        'readonly': [('state', '!=', 'ready_to_confirm')],
-                                        'required': [('state', 'in', ['ready_to_confirm','sale', 'done'])]}"/>
+                                        'readonly': [('state', '!=', 'ready_to_confirm')]}"/>
                         <field name="customer_po_filename" invisible="1"/>
                     </div>
                     <field name="next_apporoval_user_ids" widget="many2many_tags" invisible="1"/>
