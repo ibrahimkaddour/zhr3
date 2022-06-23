@@ -121,7 +121,7 @@ class ProductTemplate(models.Model):
     def write(self, vals):
         res = super(ProductTemplate, self).write(vals)
         # _logger.critical('--*************--')
-
+	 	
         code = self.env['product.product'].search([
             ('product_tmpl_id', '=', self.id), ('active', '=', False)], limit=1, order='default_code DESC').default_code
         if code:
@@ -129,7 +129,7 @@ class ProductTemplate(models.Model):
         else:
             if self.seq_from:
                 seq = int(self.seq_from)
-        if self.variant_ids:
+        if len(self.variant_ids)>0:
             for line in self.variant_ids:
                 # if str(seq) in variants_archived:
                 #     seq += 1
