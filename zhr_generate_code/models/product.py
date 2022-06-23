@@ -105,35 +105,3 @@ class ProductTemplate(models.Model):
         self.invalidate_cache()
         return True
 
-    @api.model
-    def create(self, vals):
-        res = super(ProductTemplate, self).create(vals)
-
-        if vals['seq_from']:
-            res.seq_to = int(vals['seq_from']) + 9999999
-            seq = int(vals['seq_from'])
-            for variant in res.variant_ids:
-                variant.write({'default_code': seq})
-                seq += 1
-            res.is_seq_readonly = True
-        return res
-
-    def write(self, vals):
-        res = super(ProductTemplate, self).write(vals)
-        # _logger.critical('--*************--')
-	 	
-        code = self.env['product.product'].search([
-            ('product_tmpl_id', '=', self.id), ('active', '=', False)], limit=1, order='default_code DESC').default_code
-        if code:
-            seq = int(code) + 1
-        else:
-            if self.seq_from:
-                seq = int(self.seq_from)
-        if len(self.variant_ids)>0:
-            for line in self.variant_ids:
-                # if str(seq) in variants_archived:
-                #     seq += 1
-                #     continue
-                line.write({'default_code': seq})
-                seq += 1
-        return res
