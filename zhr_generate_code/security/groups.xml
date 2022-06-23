@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="allow_see_product_sequence" model="res.groups">
+        <field name="name">User Can See Product Sequence</field>
+    </record>
+</odoo>
