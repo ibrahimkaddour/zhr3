@@ -71,7 +71,7 @@ class ProductTemplate(models.Model):
                         current_variants_to_activate += existing_variants[combination]
                     else:
                         current_variants_to_create.append(tmpl_id._prepare_variant_values(combination))
-                        if len(current_variants_to_create) > 999999:
+                        if len(current_variants_to_create) > 9999999:
                             raise UserError(_(
                                 'The number of variants to generate is too high. '
                                 'You should either not generate variants for each combination or generate them on demand from the sales order. '
@@ -136,6 +136,4 @@ class ProductTemplate(models.Model):
                 #     continue
                 line.write({'default_code': seq})
                 seq += 1
-
-            # raise
         return res
