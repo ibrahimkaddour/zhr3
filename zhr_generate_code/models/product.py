@@ -110,7 +110,7 @@ class ProductTemplate(models.Model):
         res = super(ProductTemplate, self).create(vals)
 
         if vals['seq_from']:
-            res.seq_to = int(vals['seq_from']) + 999999
+            res.seq_to = int(vals['seq_from']) + 9999999
             seq = int(vals['seq_from'])
             for variant in res.variant_ids:
                 variant.write({'default_code': seq})
