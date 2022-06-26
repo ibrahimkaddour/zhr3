@@ -36,6 +36,9 @@
                     <button name="action_confirm" string="Confirm" type="object" class='oe_highlight'
                             attrs="{'invisible': [('state', 'not in', ['ready_to_confirm'])]}"
                             groups="sales_team.group_sale_salesman"/>
+                    <button name="action_print" string="PRINT" type="object" class='oe_highlight'
+                            attrs="{'invisible': [('state', 'not in', ['ready_to_confirm','sale','done'])]}"
+                            groups="sales_team.group_sale_salesman"/>
                 </xpath>
 
                 <xpath expr="//form[1]/header[1]/button[@name='action_confirm'][1]" position="attributes">
@@ -77,7 +80,8 @@
                         <field name="customer_po" nolabel="1"
                                filename="customer_po_filename"
                                attrs="{'invisible': [('state', 'not in', ['ready_to_confirm', 'sale', 'done'])],
-                                        'readonly': [('state', '!=', 'ready_to_confirm')]}"/>
+                                        'readonly': [('state', '!=', 'ready_to_confirm')],
+                                        'required': [('state', 'in', ['ready_to_confirm','sale', 'done'])]}"/>
                         <field name="customer_po_filename" invisible="1"/>
                     </div>
                     <field name="next_apporoval_user_ids" widget="many2many_tags" invisible="1"/>
@@ -103,6 +107,59 @@
                 </xpath>
             </field>
         </record>
+
+        <record id="saleaction_report_saleorder" model="ir.actions.report">
+            <field name="name">Quotation / Order</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sale.report_saleorder</field>
+            <field name="report_file">sale.report_saleorder</field>
+            <field name="print_report_name">(object.state in ('ready_to_confirm') and 'Quotation - %s' % (object.name)) or 'Order - %s' % (object.name)</field>
+            <field name="binding_model_id" ref="model_sale_order"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="gst_report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document">
+            <xpath expr="//h2[@class='mt16']" position="replace">
+                <h2 class="mt16">
+                    <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
+                        <span t-if="doc.state in ['sale','done']">Order # </span>
+                        <span t-if="doc.state in ['ready_to_confirm']">Quotation # </span>
+                    </t>
+                    <t t-if="env.context.get('proforma', False) or is_pro_forma">
+                        <span>Pro-Forma Invoice # </span>
+                    </t>
+                    <span t-field="doc.name"/>
+                </h2>
+            </xpath>
+            <xpath expr="//div[@id='informations']" position="replace">
+                <div class="row mt32 mb32" id="informations">
+                    <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Your Reference:</strong>
+                        <p class="m-0" t-field="doc.client_order_ref"/>
+                    </div>
+                    <div t-if="doc.date_order and doc.state in ['sale','done']" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Order Date:</strong>
+                        <p class="m-0" t-field="doc.date_order"/>
+                    </div>
+                    <div t-if="doc.date_order and doc.state in ['sale','done']" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Quotation Date:</strong>
+                        <p class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'/>
+                    </div>
+                    <div t-if="doc.validity_date and doc.state in ['ready_to_confirm']" class="col-auto col-3 mw-100 mb-2" name="expiration_date">
+                        <strong>Expiration:</strong>
+                        <p class="m-0" t-field="doc.validity_date"/>
+                    </div>
+                    <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Salesperson:</strong>
+                        <p class="m-0" t-field="doc.user_id"/>
+                    </div>
+                </div>
+            </xpath>
+
+        </template>
+
+
 
     </data>
 </odoo>
