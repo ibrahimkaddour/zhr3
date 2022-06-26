@@ -664,18 +664,30 @@
                             </tr>
 
                         </table>
-                        <table width="100%"
+                         <table width="100%"
                                style="border-spacing: 1em .5em;padding: 0 2em 1em 0;border: 1px solid black;">
                             <tr>
                                 <td width="20%" colspan="2" class="text-left"
                                     style="font-size:15px; padding:1px;border:1px solid black !important;border-right:none">
-                                    Remarks:
+                                    Remark:
                                 </td>
-                                <td width="80%" class="text-center"
+                                <td width="80%" class="text-left"
                                     style="font-size:15px;font-family:'Cairo'n; padding:1px;border:1px solid black !important;">
                                     <p>This invoice is computer generated print out no signature or stamp is required
                                     </p>
+                                </td>
+                            </tr>
+                        </table>
+                        <table width="100%"
+                               style="border-spacing: 1em .5em;padding: 0 2em 1em 0;border: 1px solid black;">
+                            <tr>
+                                <td width="80%" class="text-right"
+                                    style="font-size:15px;font-family:'Cairo'n; padding:1px;border:1px solid black !important;">
                                     <p>هذه الفاتورة الكترونية ولا تختاج توقيع او ختم</p>
+                                </td>
+                                <td width="20%" colspan="2" class="text-right"
+                                    style="font-size:15px; padding:1px;border:1px solid black !important;border-right:none">
+                                    ملاحظة:
                                 </td>
                             </tr>
                         </table>
