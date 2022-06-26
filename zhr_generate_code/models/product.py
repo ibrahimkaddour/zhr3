@@ -105,6 +105,7 @@ class ProductTemplate(models.Model):
         self.invalidate_cache()
         return True
 
+<<<<<<< HEAD
     @api.model
     def create(self, vals):
         res = super(ProductTemplate, self).create(vals)
@@ -143,3 +144,5 @@ class ProductProduct(models.Model):
         #         seq += 1
         #     res.is_seq_readonly = True
         return res
+=======
+>>>>>>> 3722548a181d7416f6414e64aa0c197f818e73ff
