@@ -1,0 +1,36 @@
+# -*- coding: utf-8 -*-
+{
+    'name': 'AMCL : BOM Request',
+    'category': 'Sales',
+    'sequence': 1,
+    'version': '15.0.1',
+    'license': 'LGPL-3',
+    'summary': """AMCL : BOM Request""",
+    'description': """AMCL : BOM Request""",
+    'author': 'Aneesh.AV',
+    'depends': ['product',
+                'amcl_sale_order_approval',
+                'sale_management',
+                'mrp',
+                ],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/bom_sequence_data.xml',
+        'data/mail_template_data.xml',
+        'data/mrp_data.xml',
+        'wizard/import_components_view.xml',
+        'views/product_view.xml',
+        'views/sale_view.xml',
+        'views/bom_view.xml',
+        'views/bom_request_view.xml',
+        'views/bom_dummy_view.xml',
+        'wizard/bom_request_assign_view.xml',
+        'views/mrp_routing_view.xml',
+        'views/mrp_production_view.xml',
+    ],
+    'installable': True,
+    'application': True,
+}
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

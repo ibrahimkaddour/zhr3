@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_order_form" model="ir.ui.view">
+            <field name="name">view.order.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <field name="show_request_bom" invisible="1"/>
+                    <field name="bom_request_id" invisible="1"/>
+                    <button name="request_bom" string="Request BOM" type="object" class="btn-primary" attrs="{'invisible':[('show_request_bom','=',False)]}"/>
+                </xpath>
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']//tree//field[@name='name']" position="after">
+                    <field name="non_standard_bom" invisible="1"/>
+                    <field name="bom_id" domain='[("product_id","=",product_id)]'/>
+                </xpath>
+                <xpath expr="//sheet//button[@name='preview_sale_order']" position="before">
+                    <button name="action_view_bom_request" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('bom_request_id', '=', False)]}">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">BOM Request</span>
+                            <span class="o_stat_text"></span>
+                        </div>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
