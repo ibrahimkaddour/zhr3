@@ -13,7 +13,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/product_group.xml',
-        # 'views/product_inherit.xml',
+        'views/product_inherit.xml',
         'reports/inherit_template.xml',
     ],
     'installable': True,
