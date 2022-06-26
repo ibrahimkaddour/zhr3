@@ -7,6 +7,9 @@
         <field name="arch" type="xml">
 
             <xpath expr="//notebook/page[@name='general_information']" position="after">
+                <page string="Variant" groups="zhr_generate_code.allow_see_product_sequence">
+                    <field name="variant_ids" readonly="1"/>
+                </page>
                 <page string="Sequence" groups="zhr_generate_code.allow_see_product_sequence">
                     <group>
                         <group>
@@ -18,13 +21,10 @@
                         </group>
                     </group>
                 </page>
-                <page string="Variant" groups="zhr_generate_code.allow_see_product_sequence">
-                    <field name="variant_ids" readonly="1"/>
-                </page>
             </xpath>
-<!--            <xpath expr="//field[@name='attribute_line_ids']" position="attributes">-->
-<!--                <attribute name="attrs">{'readonly':[('is_seq_readonly','=',True)]}</attribute>-->
-<!--            </xpath>-->
+            <xpath expr="//page[@name='variants']/field[@name='attribute_line_ids']" position="attributes">
+                <attribute name="attrs">{'readonly':[('is_seq_readonly','=',True)]}</attribute>
+            </xpath>
         </field>
     </record>
 </odoo>
