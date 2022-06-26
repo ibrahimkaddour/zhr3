@@ -14,5 +14,31 @@
                 <span t-field="doc.name"/>
             </h2>
         </xpath>
+
+         <xpath expr="//div[@id='informations']" position="replace">
+             <div class="row mt32 mb32" id="informations">
+                 <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2">
+                     <strong>Your Reference:</strong>
+                     <p class="m-0" t-field="doc.client_order_ref"/>
+                 </div>
+                 <div t-if="doc.date_order and doc.state not in ['draft','sent','waiting_for_approval','waiting_for_approval_ceo','ready_to_confirm']" class="col-auto col-3 mw-100 mb-2">
+                     <strong>Order Date:</strong>
+                     <p class="m-0" t-field="doc.date_order"/>
+                 </div>
+                 <div t-if="doc.date_order and doc.state in ['draft','sent','waiting_for_approval','waiting_for_approval_ceo','ready_to_confirm']" class="col-auto col-3 mw-100 mb-2">
+                     <strong>Quotation Date:</strong>
+                     <p class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'/>
+                 </div>
+                 <div t-if="doc.validity_date and doc.state in ['draft','sent','waiting_for_approval','waiting_for_approval_ceo','ready_to_confirm']" class="col-auto col-3 mw-100 mb-2"
+                      name="expiration_date">
+                     <strong>Expiration:</strong>
+                     <p class="m-0" t-field="doc.validity_date"/>
+                 </div>
+                 <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
+                     <strong>Salesperson:</strong>
+                     <p class="m-0" t-field="doc.user_id"/>
+                 </div>
+             </div>
+         </xpath>
     </template>
 </odoo>
