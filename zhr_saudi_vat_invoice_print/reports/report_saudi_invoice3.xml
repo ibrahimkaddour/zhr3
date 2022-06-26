@@ -167,7 +167,7 @@
             <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout"
                  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
                  t-att-data-oe-lang="o and o.env.context.get('lang')">
-                <div class="pt-5" style="padding-top: 2rem !important">
+                <div class="pt-5" style="padding-top: 0.5rem !important">
                     <!-- This div ensures that the address is not cropped by the header. -->
                     <t t-call="web.address_layout"/>
                 </div>
@@ -618,7 +618,8 @@
                                         <t t-if="doc.move_type == 'out_invoice'">الإجمالي</t>
                                         <t t-if="doc.move_type == 'out_refund'">إجمالي المرتجع</t>
                                     </td>
-                                    <td class="text-center" style="font-size:15px;padding:1px;border:1px solid black !important;">
+                                    <td class="text-center"
+                                        style="font-size:15px;padding:1px;border:1px solid black !important;">
                                         <span t-esc="'{:,.2f}'.format(doc.price_before_discount)"/>
                                     </td>
                                 </tr>
@@ -631,7 +632,8 @@
                                         style="font-size:15px;font-family:'Cairo'n; padding:1px;border:1px solid black !important;">
                                         مجموع الخصومات
                                     </td>
-                                    <td class="text-center" style="font-size:15px;padding:1px;border:1px solid black !important;">
+                                    <td class="text-center"
+                                        style="font-size:15px;padding:1px;border:1px solid black !important;">
                                         <span t-esc="'{:,.2f}'.format(doc.discount)"/>
                                     </td>
                                 </tr>
@@ -658,6 +660,22 @@
                                 <td width="20%" class="text-right"
                                     style="font-size:15px;font-family:'Cairo'n; padding:1px;border:1px solid black !important;">
                                     قيمة الفاتوره
+                                </td>
+                            </tr>
+
+                        </table>
+                        <table width="100%"
+                               style="border-spacing: 1em .5em;padding: 0 2em 1em 0;border: 1px solid black;">
+                            <tr>
+                                <td width="20%" colspan="2" class="text-left"
+                                    style="font-size:15px; padding:1px;border:1px solid black !important;border-right:none">
+                                    Remarks:
+                                </td>
+                                <td width="80%" class="text-center"
+                                    style="font-size:15px;font-family:'Cairo'n; padding:1px;border:1px solid black !important;">
+                                    <p>This invoice is computer generated print out no signature or stamp is required
+                                    </p>
+                                    <p>هذه الفاتورة الكترونية ولا تختاج توقيع او ختم</p>
                                 </td>
                             </tr>
                         </table>
@@ -767,7 +785,8 @@
             -->
             <t t-foreach="tax_totals['subtotals']" t-as="subtotal">
                 <tr>
-                    <td width="38%" class="text-center" style="font-size:15px;padding:1px;border:1px solid black !important;">
+                    <td width="38%" class="text-center"
+                        style="font-size:15px;padding:1px;border:1px solid black !important;">
                         <t t-if="doc.move_type == 'out_invoice'">Total Taxable Amount</t>
                         <t t-if="doc.move_type == 'out_refund'">Total Returned Taxable Amount</t>
                     </td>
