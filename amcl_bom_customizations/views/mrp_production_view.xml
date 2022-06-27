@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="mrp_production_form_view" model="ir.ui.view">
+            <field name="name">mrp.routing.form</field>
+            <field name="model">mrp.production</field>
+            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='operations']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('is_planned', '!=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='bom_id']" position="after">
+                    <field name="sale_reference" invisible="1"/>
+                    <field name="routing_id" readonly="1"/>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="client_name" attrs="{'invisible':[('client_name','=',False)]}"/>
+                    <field name="client_order_ref" attrs="{'invisible':[('client_order_ref','=',False)]}"/>
+                    <field name="line_no"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_mrp_production_work_order_search_so_mo_custom" model="ir.ui.view">
+            <field name="name">mrp.production.work.order.search</field>
+            <field name="model">mrp.workorder</field>
+            <field name="inherit_id" ref="mrp.view_mrp_production_work_order_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search/field[@name='workcenter_id']" position="after">
+                    <field name='sale_reference' string="SO Line" invisible="1"
+                           filter_domain="[('sale_reference','ilike',self)]"/>
+                </xpath>
+
+            </field>
+        </record>
+
+
+
+    </data>
+</odoo>
