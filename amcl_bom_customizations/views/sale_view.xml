@@ -13,9 +13,17 @@
                     <button name="request_bom" string="Request BOM" type="object" class="btn-primary" attrs="{'invisible':[('show_request_bom','=',False)]}"/>
                 </xpath>
                 <xpath expr="//page[@name='order_lines']/field[@name='order_line']//tree//field[@name='name']" position="after">
-                    <field name="non_standard_bom" invisible="1"/>
+
                     <field name="bom_id" domain='[("product_id","=",product_id)]'/>
                 </xpath>
+
+                <xpath expr="//page[@name='order_lines']/field[@name='order_line']//tree//field[@name='product_id']" position="after">
+                    <field name="standard_bom" invisible="1"/>
+                    <field name="non_standard_bom" invisible="1"/>
+                    <button name="on_standard_bom" string="S" type="object" class="btn-primary" attrs="{'invisible':['|',('standard_bom','=',True),('non_standard_bom','=',True)]}"/>
+                    <button name="on_non_standard_bom" string="N" type="object" class="btn-primary" attrs="{'invisible':['|',('standard_bom','=',True),('non_standard_bom','=',True)]}"/>
+                </xpath>
+
                 <xpath expr="//sheet//button[@name='preview_sale_order']" position="before">
                     <button name="action_view_bom_request" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('bom_request_id', '=', False)]}">
                         <div class="o_field_widget o_stat_info">
