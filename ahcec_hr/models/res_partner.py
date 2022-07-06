@@ -8,4 +8,4 @@ class ResPartner(models.Model):
 
     institute = fields.Boolean('Institute', help="Check this box if this contact is a institute.")
     employee = fields.Boolean('Employee')
-    arabic_name = fields.Char('Arabic Name', size=120)
+    # arabic_name = fields.Char('Arabic Name', size=120)

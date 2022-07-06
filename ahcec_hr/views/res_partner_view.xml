@@ -13,9 +13,9 @@
 <!--             <field name="customer" position="after">-->
 <!--                 <field name="employee"/>-->
 <!--             </field>-->
-             <field name="name" position="after">
-                 <field name="arabic_name"/>
-             </field>
+<!--             <field name="name" position="after">-->
+<!--                 <field name="arabic_name"/>-->
+<!--             </field>-->
          </field>
     </record>
 </odoo>
