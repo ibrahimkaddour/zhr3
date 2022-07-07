@@ -120,9 +120,9 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='newly_hired_employee']" position="attributes">
-                <attribute name="groups">hr_recruitment.group_hr_recruitment_user</attribute>
-            </xpath>
+<!--            <xpath expr="//filter[@name='newly_hired_employee']" position="attributes">-->
+<!--                <attribute name="groups">hr_recruitment.group_hr_recruitment_user</attribute>-->
+<!--            </xpath>-->
             <xpath expr="//filter[@name='inactive']" position="after">
                 <filter name="Saudi" string="Saudi" domain="[('is_saudi','=',True)]"/>
                 <filter name="Non-Saudi" string="Non-Saudi" domain="[('is_saudi','=',False)]"/>
