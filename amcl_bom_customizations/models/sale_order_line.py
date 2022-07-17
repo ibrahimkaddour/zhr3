@@ -34,8 +34,6 @@ class Sale(models.Model):
                 manufacture = self.env['stock.location.route'].search([('name', '=', 'Manufacture')])
                 self.product_id.write({'route_ids': [(5, )]})
                 self.product_id.write({'route_ids': [(4, manufacture.id), (4, mto_route.id)]})
-
-                print(route.name)
             self.onchange_product_set_bom()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1,5 +1,9 @@
 # -*- coding:utf-8 -*-
 from odoo import fields, models, api
+import xlwt
+from xlwt import easyxf
+import math
+import io
 
 selection_data = [
     ('normal', 'Manufacture this product', 'bom_type'),('phantom', 'Kit', 'bom_type'),
@@ -94,6 +98,66 @@ class BOMDummy(models.Model):
                 'state': 'revise',
             })
 
+    def action_download_components(self):
+        import base64
+        filename = 'BOM Components.xls'
+        workbook = xlwt.Workbook()
+        style = xlwt.XFStyle()
+        tall_style = xlwt.easyxf('font:height 720;')  # 36pt
+        worksheet = workbook.add_sheet('Sheet 1')
+        num_style = easyxf(num_format_str='#,##0')
+        num_bold = easyxf('font:bold on', num_format_str='#,##0', )
+        heading_style = easyxf(
+            'font:name Arial, bold on,height 350, color  dark_green; align: vert centre, horz center ;')
+        heading_style1 = easyxf(
+            'font:name Arial, bold on,height 250, color  dark_green; align: vert centre, horz center ;')
+        first_col = worksheet.col(0)
+        first_col.width = 256 * 30
+        second_col = worksheet.col(1)
+        second_col.width = 256 * 20
+        three_col = worksheet.col(2)
+        three_col.width = 256 * 20
+        four_col = worksheet.col(5)
+        four_col.width = 256 * 30
+        five_col = worksheet.col(7)
+        five_col.width = 256 * 20
+        small_heading_style = easyxf(
+            'font:  name  Century Gothic, bold on, color white , height 230 ; pattern: pattern solid,fore-colour dark_green; align: vert centre, horz center ;')
+        medium_heading_style = easyxf(
+            'font:name Arial, bold on,height 250, color  dark_green; align: vert centre, horz center ;')
+        bold = easyxf('font: bold on ')
+        worksheet.write_merge(0, 3, 0, 3, 'BOM COMPONENTS')
+        worksheet.write_merge(5, 5, 0, 3, 'POS Products Details', medium_heading_style)
+        worksheet.write(6, 0, 'Component Name', small_heading_style)
+        worksheet.write(6, 0, 'Internal Reference', small_heading_style)
+        worksheet.write(6, 1, 'Quantity', small_heading_style)
+        worksheet.write(6, 2, 'UOM', small_heading_style)
+
+
+        r = 7
+        for line in self.bom_dummy_line_ids:
+            worksheet.write(r, 0, line.product_id.name)
+            worksheet.write(r, 1, str(line.product_id.default_code))
+            worksheet.write(r, 2, str(line.quantity), num_style)
+            worksheet.write(r, 3, line.product_uom_id.name)
+
+        fp = io.BytesIO()
+        workbook.save(fp)
+        export_id = self.env['sale.excel.report'].create(
+            {'excel_file': base64.encodestring(fp.getvalue()), 'file_name': filename})
+        fp.close()
+        return {
+            'view_mode': 'form',
+            'res_id': export_id.id,
+            'res_model': 'bom.excel.report',
+            'view_type': 'form',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+        }
+        return True
+
+
+
 class BoMDummyLine(models.Model):
     _name = 'bom.dummy.line'
     _description = 'BOM Dummy line'
@@ -129,5 +193,12 @@ class BoMDummyLine(models.Model):
                 result = self._cr.dictfetchall()
                 value = result and result[0] and result[0].get('value')
             line.product_value = value or 0.0
+
+class bom_excel_report(models.TransientModel):
+	_name= "bom.excel.report"
+
+
+	excel_file = fields.Binary('BOM Componenets Excel Report', readonly = True)
+	file_name = fields.Char('Excel File', size=64,readonly= True)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -47,7 +47,10 @@
                         </group>
                         <notebook>
                             <page name="components" string="Components">
-<!--                                <button name="%(action_generate_components)d" string="Import Components" type="action" class="btn-primary" attrs="{'invisible': [('state','not in',['draft'])]}"/>-->
+                                <button name="%(action_generate_components)d" string="Import Components" type="action" class="btn-primary" attrs="{'invisible': [('state','not in',['draft'])]}"/>
+                                <button name="action_download_components" string="Export Components" type="action" class="btn-primary" attrs="{'invisible': [('state','not in',['draft'])]}"/>
+
+
                                 <field name="bom_dummy_line_ids" attrs="{'readonly': [('state', 'not in', ['draft','revise'])]}" options="{'no_open':True}">
                                     <tree editable="bottom">
                                         <field name="product_id"/>
@@ -75,6 +78,8 @@
                 </form>
             </field>
         </record>
+
+
 
     </data>
 </odoo>

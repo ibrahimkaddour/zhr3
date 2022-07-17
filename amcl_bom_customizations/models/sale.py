@@ -84,6 +84,7 @@ class Sale(models.Model):
                     'label': line.label,
                     'drawing': line.drawing,
                     'quantity': line.product_uom_qty,
+                    # 'quantity': 1,
                     'product_uom_id': line.product_uom.id,
                     'order_line_id': line.id
                 }))
