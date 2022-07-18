@@ -18,6 +18,8 @@ class MrpProduction(models.Model):
         for value in self:
             sale_ids = self.env['sale.order'].search([('name', '=', value.origin)]).order_line.filtered(
                 lambda m: m.product_uom_qty == value.product_qty and m.product_id.id == value.product_id.id)
+            print('mo  name:: ', value.name)
+            print('sale ids:: ', sale_ids)
             if sale_ids:
                 for sale in sale_ids:
                     value.sale_reference = sale.id
@@ -49,15 +51,17 @@ class MrpProduction(models.Model):
     def action_confirm(self):
         if self._context.get('from_saleorder', False):
             return True
+        for mrp in self:
+            print('BOM :: ', mrp.name)
 
-        if self.sale_reference and self.sale_reference.bom_id and self.sale_reference.bom_id != self.bom_id.id:
-            self.state = 'draft'
-            self.move_raw_ids.unlink()
-            self.bom_id = self.sale_reference.bom_id.id
-            self.product_qty = self.sale_reference.bom_id.product_qty
-            self.product_uom_id = self.sale_reference.bom_id.product_uom_id.id
-            self._onchange_product_id()
-            self._onchange_move_raw()
+            if mrp.sale_reference and mrp.sale_reference.bom_id and mrp.sale_reference.bom_id != mrp.bom_id.id:
+                mrp.state = 'draft'
+                mrp.move_raw_ids.unlink()
+                mrp.bom_id = mrp.sale_reference.bom_id.id
+                mrp.product_qty = mrp.sale_reference.bom_id.product_qty
+                mrp.product_uom_id = mrp.sale_reference.bom_id.product_uom_id.id
+                mrp._onchange_product_id()
+                mrp._onchange_move_raw()
         res = super().action_confirm()
         return res
 
