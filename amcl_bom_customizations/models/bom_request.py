@@ -3,8 +3,11 @@ from odoo import fields, models, api
 from odoo.exceptions import ValidationError
 
 selection_data = [
-    ('draft', 'Draft', 'bom_request_status'), ('assigned', 'Assigned', 'bom_request_status'), ('revise', 'Revise', 'bom_request_status'), ('confirmed', 'Confirmed', 'bom_request_status'),('cancel', 'Cancel', 'bom_request_status'),
+    ('draft', 'Draft', 'bom_request_status'), ('assigned', 'Assigned', 'bom_request_status'),
+    ('revise', 'Revise', 'bom_request_status'), ('confirmed', 'Confirmed', 'bom_request_status'),
+    ('cancel', 'Cancel', 'bom_request_status'),
 ]
+
 
 def _get_selections(category):
     data = filter(lambda x: x[2] == category, selection_data)
@@ -37,7 +40,7 @@ class BOMRequest(models.Model):
             })
         res = super(BOMRequest, self).create(vals)
         return res
-    
+
     def assign_bom_request(self):
         context = {
             'default_bom_request_id': self.id,
@@ -52,10 +55,10 @@ class BOMRequest(models.Model):
         }
 
     def cancel_dummy_bom(self):
-        bom_dummy_ids = self.env['bom.dummy'].search([('bom_request_line_id','in',self.bom_request_line_ids.ids)])
+        bom_dummy_ids = self.env['bom.dummy'].search([('bom_request_line_id', 'in', self.bom_request_line_ids.ids)])
         for each in bom_dummy_ids:
             each.state = 'cancel'
-    
+
     @api.depends('user_id')
     def set_read_for_user(self):
         result = True
@@ -64,7 +67,7 @@ class BOMRequest(models.Model):
         self.read_for_user = result
 
     def update_state(self):
-        bom_dummy_ids = self.env['bom.dummy'].search([('bom_request_line_id','in',self.bom_request_line_ids.ids)])
+        bom_dummy_ids = self.env['bom.dummy'].search([('bom_request_line_id', 'in', self.bom_request_line_ids.ids)])
         approve_flag = True
         # bom_dummy_state = [each.state for each in bom_dummy_ids]
         for each in bom_dummy_ids:
@@ -74,7 +77,7 @@ class BOMRequest(models.Model):
             self.write({
                 'state': 'confirmed',
             })
-    
+
     # def need_dm_approval(self):
     #     # changes state of quotation if there are any products in line that is non-standard and have BOM added.
     #     need_approval = []
@@ -85,7 +88,6 @@ class BOMRequest(models.Model):
     #         self.order_id.write({
     #             'state': 'sm_approve',
     #         })
-
 
 
 class BOMRequestLine(models.Model):
@@ -106,7 +108,7 @@ class BOMRequestLine(models.Model):
     line_no = fields.Char(string="Line No")
 
     def create_or_view_bom_dummy(self):
-        if self.request_id.state in ['assigned','revise','confirmed','cancel']:
+        if self.request_id.state in ['assigned', 'revise', 'confirmed', 'cancel']:
             context = dict(self.env.context)
             # bom_dummy_id = self.env['bom.dummy'].sudo().search([('bom_request_line_id', '=', self.id)])
             action = {

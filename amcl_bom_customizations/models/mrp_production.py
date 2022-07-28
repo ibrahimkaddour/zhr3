@@ -52,8 +52,6 @@ class MrpProduction(models.Model):
         if self._context.get('from_saleorder', False):
             return True
         for mrp in self:
-            print('BOM :: ', mrp.name)
-
             if mrp.sale_reference and mrp.sale_reference.bom_id and mrp.sale_reference.bom_id != mrp.bom_id.id:
                 mrp.state = 'draft'
                 mrp.move_raw_ids.unlink()
