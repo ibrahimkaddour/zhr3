@@ -12,6 +12,7 @@ class MrpProduction(models.Model):
     client_order_ref = fields.Char(string='Customer Reference')
     line_no = fields.Char(string="Line No", related='bom_id.line_no')
     sale_reference = fields.Many2one('sale.order.line', string='SO Line', compute='_compute_reference_value')
+    product_desc = fields.Text(related='sale_reference.name')
 
     @api.depends('origin')
     def _compute_reference_value(self):

@@ -14,12 +14,12 @@
             <xpath expr="//group[@name='sale_header']" position="after">
                 <group>
                     <group>
-                        <field name="client_order_ref" required="1"/>
+                        <field name="client_order_ref" required="0"/>
                     </group>
                     <group name="sale_shipping">
                         <label for="commitment_date" string="Delivery Date"/>
                         <div name="commitment_date_div" class="o_row">
-                            <field name="commitment_date" required="1"/>
+                            <field name="commitment_date" required="0"/>
                             <span name="expected_date_span" class="text-muted">Expected:
                                 <field name="expected_date" widget="date"/>
                             </span>
