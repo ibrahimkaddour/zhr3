@@ -13,16 +13,4 @@
         </field>
     </record>
 
-    <record id="manufacturing_form_view_inherit" model="ir.ui.view">
-        <field name="name">Add Description on line Operations</field>
-        <field name="model">mrp.production</field>
-        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
-        <field name="arch" type="xml">
-
-            <xpath expr="//notebook/page[@name='components']/field[@name='move_raw_ids']/tree/field[@name='name']" position="replace">
-                <field name="name" invisible="0"/>
-            </xpath>
-
-        </field>
-    </record>
 </odoo>

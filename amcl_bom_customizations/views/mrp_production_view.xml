@@ -13,6 +13,7 @@
                 <xpath expr="//field[@name='bom_id']" position="after">
                     <field name="sale_reference" invisible="1"/>
                     <field name="routing_id" readonly="1"/>
+                    <field name="product_desc"/>
                 </xpath>
                 <xpath expr="//field[@name='user_id']" position="after">
                     <field name="client_name" attrs="{'invisible':[('client_name','=',False)]}"/>
