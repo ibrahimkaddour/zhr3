@@ -56,8 +56,10 @@ class MrpProduction(models.Model):
                 mrp.state = 'draft'
                 mrp.move_raw_ids.unlink()
                 mrp.bom_id = mrp.sale_reference.bom_id.id
-                mrp.product_qty = mrp.sale_reference.bom_id.product_qty
-                mrp.product_uom_id = mrp.sale_reference.bom_id.product_uom_id.id
+                # mrp.product_qty = mrp.sale_reference.bom_id.product_qty
+                mrp.product_qty = mrp.sale_reference.product_uom_qty
+                # mrp.product_uom_id = mrp.sale_reference.bom_id.product_uom_id.id
+                mrp.product_uom_id = mrp.sale_reference.product_uom.id
                 mrp._onchange_product_id()
                 mrp._onchange_move_raw()
         res = super().action_confirm()
