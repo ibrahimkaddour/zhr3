@@ -6,7 +6,7 @@ class PurchaseOrder(models.Model):
 
     user_approve_id = fields.Many2one('res.users', 'User Approval')
 
-    def confirm_by_ceo(self):
+    def action_confirm(self):
         res = super(PurchaseOrder, self).action_confirm()
         self.write({'user_approve_id': self.env.user.id})
         return res
