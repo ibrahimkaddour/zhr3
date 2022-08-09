@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
     <template id="id_report_saleorder_document_inherit_sale_stock" inherit_id="sale.report_saleorder_document">
+
+        <xpath expr="//td[@t-if='display_discount']" position="replace">
+            <!--            <span t-field="line.discount"/>-->
+            <td t-if="display_discount" class="text-right" groups="product.group_discount_per_so_line">
+                <span t-esc="'{:,.2f}'.format(line.discount)"/>
+            </td>
+<!--            <span t-esc="'{:,.2f}'.format(line.discount)"/>-->
+        </xpath>
+
         <xpath expr="//div[@class='page']/h2[@class='mt16']" position="replace">
             <h2 class="mt16">
                 <t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
@@ -30,19 +39,17 @@
                         <t t-esc="doc.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>:
                         <span t-field="doc.partner_id.vat"/>
                     </p>
-                    <span t-if="doc.state in ['draft','sent','waiting_for_approval','waiting_for_approval_ceo','ready_to_confirm']">
-                        <t t-if="doc.partner_id.child_ids">
-                            <div>Contact Person:
-                                <t t-esc="doc.partner_id.child_ids[0].name"/>
-                            </div>
-                            <div t-if="doc.partner_id.child_ids[0].mobile">Mob/Tel:
-                                <t t-esc="doc.partner_id.child_ids[0].mobile"/>
-                            </div>
-                            <div t-if="doc.partner_id.child_ids[0].email">Email:
-                                <t t-esc="doc.partner_id.child_ids[0].email"/>
-                            </div>
-                        </t>
-                    </span>
+                    <t t-if="doc.partner_id.child_ids">
+                        <div>Contact Person:
+                            <t t-esc="doc.partner_id.child_ids[0].name"/>
+                        </div>
+                        <div t-if="doc.partner_id.child_ids[0].mobile">Mob/Tel:
+                            <t t-esc="doc.partner_id.child_ids[0].mobile"/>
+                        </div>
+                        <div t-if="doc.partner_id.child_ids[0].email">Email:
+                            <t t-esc="doc.partner_id.child_ids[0].email"/>
+                        </div>
+                    </t>
                 </t>
             </xpath>
         </xpath>
@@ -68,14 +75,19 @@
                         <p class="m-0" t-field="doc.user_id"/>
                     </div>
 
+                    <div class="col-auto col-3 mw-100 mb-2">
+                        <strong>Customer Po:</strong>
+                        <p class="m-0" t-field="doc.customer_po_text"/>
+                    </div>
+
                     <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
                         <strong>Email:</strong>
-                        <p class="m-0" t-field="doc.user_id.email"/>
+                        <p class="m-0" t-field="doc.user_id.partner_id.email"/>
                     </div>
 
                     <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
                         <strong>Tel/Mob No:</strong>
-                        <p class="m-0" t-field="doc.user_id.mobile"/>
+                        <p class="m-0" t-field="doc.user_id.partner_id.mobile"/>
                     </div>
 
                     <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
@@ -86,7 +98,7 @@
 
                 <!-- SALE ORDER -->
                 <t t-if="doc.date_order and doc.state not in ['draft','sent','waiting_for_approval','waiting_for_approval_ceo','ready_to_confirm']">
-                    <div  class="col-auto col-3 mw-100 mb-2">
+                    <div class="col-auto col-3 mw-100 mb-2">
                         <strong>Quotation Reference:</strong>
                         <p class="m-0" t-field="doc.client_order_ref"/>
                     </div>
@@ -99,7 +111,12 @@
                         <p class="m-0" t-field="doc.user_id"/>
                     </div>
 
-                    <div  class="col-auto col-3 mw-100 mb-2">
+                    <div class="col-auto col-3 mw-100 mb-2">
+                        <strong>Customer Po:</strong>
+                        <p class="m-0" t-field="doc.customer_po_text"/>
+                    </div>
+
+                    <div class="col-auto col-3 mw-100 mb-2">
                         <strong>Delivery Due Date:</strong>
                         <p class="m-0" t-field="doc.commitment_date"/>
                     </div>
@@ -110,15 +127,17 @@
 
         <xpath expr="//p[@t-field='doc.note']" position="replace">
             <div t-if="doc.note">
-                <p>Payment Terms:</p>
                 <span t-field="doc.note"/>
             </div>
-            <t t-if="doc.state in ['draft','sent','waiting_for_approval','waiting_for_approval_ceo','ready_to_confirm']">
-                <p>Highlights / Special requirements (if any)</p>
-            </t>
-            <t t-if="doc.state not in ['draft','sent','waiting_for_approval','waiting_for_approval_ceo','ready_to_confirm']">
-                <p>Remarks / Special Requirement if any</p>
-            </t>
+            <div t-if="doc.delivery_period">
+                Delivery Period:
+                <span t-field="doc.delivery_period"/>
+            </div>
+            <div t-if="doc.incoterm">
+                Incoterm:
+                <span t-field="doc.incoterm"/>
+            </div>
+            <p>Remarks / Special Requirement if any</p>
             <!--            <span Payment Terms: t-field="doc.note" </span>-->
         </xpath>
         <!--                <xpath expr="//div[@class='row mt32 mb32']" position="replace">-->
@@ -147,12 +166,12 @@
                 <!--            <br/>-->
                 <div t-if="o.date_order" class="col-2 bm-1">
                     <strong>Email:</strong>
-                    <p t-field="o.user_id.email" class="m-0"/>
+                    <p t-field="o.user_id.partner_id.email" class="m-0"/>
                 </div>
 
                 <div t-if="o.date_order" class="col-2 bm-1">
                     <strong>Tel/Mob:</strong>
-                    <p t-field="o.user_id.mobile" class="m-0"/>
+                    <p t-field="o.user_id.partner_id.mobile" class="m-0"/>
                 </div>
 
                 <div t-if="o.date_order" class="col-2 bm-1">
@@ -163,6 +182,11 @@
         </xpath>
 
         <xpath expr="//div[@class='page']">
+            <t t-if="o.payment_term_id">
+                <p style="color:black;">Payment Terms:
+                    <span t-field="o.payment_term_id.name"/>
+                </p>
+            </t>
             <p style="color:black;">Test Certificate</p>
             <p style="color:black;">Inspection</p>
             <p style="color:black;">Penalty</p>
@@ -243,10 +267,10 @@
                     <p t-field="o.state"/>
                 </div>
 
-                <!--                <div t-if="o.origin" class="col-auto" name="div_origin">-->
-                <!--                    <strong>Po Nb:</strong>-->
-                <!--                    <p t-field="o.origin"/>-->
-                <!--                </div>-->
+                <div t-if="o.customer_po_text" class="col-auto" name="div_origin">
+                    <strong>Customer Po:</strong>
+                    <p t-field="o.customer_po_text"/>
+                </div>
 
                 <div t-if="o.origin" class="col-auto" name="div_origin">
                     <strong>Delivery Terms:</strong>
@@ -284,5 +308,4 @@
             </div>
         </xpath>
     </template>
-
 </odoo>
