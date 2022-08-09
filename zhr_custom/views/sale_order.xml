@@ -21,7 +21,7 @@
                     <group>
                         <field name="client_order_ref" required="0"/>
                         <field name="customer_po_text"
-                            />
+                            attrs="{'readonly': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
 
                     </group>
                     <group name="sale_shipping">
@@ -33,7 +33,7 @@
                             </span>
                         </div>
                         <field name="delivery_period"
-                            />
+                            attrs="{'readonly': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
                     </group>
                 </group>
 
