@@ -571,7 +571,8 @@
                                         <span t-field="l.product_id.default_code"/>
                                     </td>
                                     <td class="text-left" style="padding:1px;border:1px solid black !important;">
-                                        <span style="max-width: 60ch;" t-field="l.product_id.name"/>
+<!--                                        <span style="max-width: 60ch;" t-field="l.product_id.name"/>-->
+                                        <span style="max-width: 60ch;" t-field="l.name"/>
                                     </td>
                                     <td class="text-center" style="padding:1px;border:1px solid black !important;">
                                         <span t-esc="'{:,.2f}'.format(l.quantity)"/>
