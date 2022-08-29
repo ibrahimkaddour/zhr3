@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Contract Amendment -->
+    <menuitem id="menu_contract_amendment"
+              name="Contract Amendment"
+              parent="hr.menu_hr_employee_payroll"
+
+              action="ahcec_hr_contract_amendment.action_contract_amendment_view"
+              sequence="5"
+              />
+
+</odoo>

@@ -2,14 +2,14 @@
 
 {
     'name': "Middle East Human Resource contract",
-    'summary': """ Employee Contract """,
+    'summary': """ Employee Contract ZHR *********""",
     'description': """ Additional features for hr_contract module according to SaudiArabia """,
     'author': 'ahcec',
     'website': "http://www.ahcec.com",
     'category': 'HR',
     'version': '1.5',
     'sequence': 20,
-    'depends': ['account', 'hr_contract', 'hr_payroll'],
+    'depends': ['account', 'hr_contract', 'hr_payroll', 'hr', 'base'],
     'data': [
         'security/ir.model.access.csv',
         'security/ir_rule.xml',

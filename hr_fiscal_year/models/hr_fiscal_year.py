@@ -40,7 +40,6 @@ class YearYear(models.Model):
         if nworking:
             raise ValidationError(_('You can not have calendar year that overlaps on same year!'))
 
-
     def find(self, dt=None, exception=True, previous=False):
         """
             Find the record depends on Date
@@ -83,7 +82,7 @@ class YearYear(models.Model):
                 de = ds + relativedelta(months=interval, days=-1)
                 # if de.strftime(DEFAULT_SERVER_DATE_FORMAT) > fy.date_stop:
                 if de.date() > fy.date_stop:
-                    de = datetime.strptime(fy.date_stop, DEFAULT_SERVER_DATE_FORMAT)
+                    de = datetime.strptime(str(fy.date_stop), DEFAULT_SERVER_DATE_FORMAT)
                 period_obj.create({
                     'name': ds.strftime('%m/%Y'),
                     'code': ds.strftime('%m/%Y'),

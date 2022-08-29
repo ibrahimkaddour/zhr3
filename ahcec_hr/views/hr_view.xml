@@ -44,6 +44,7 @@
                         <field name="arabic_name" placeholder="Arabic Name"/>
                         <field name="category_ids" widget="many2many_tags" placeholder="e.g. Part Time"/>
                         <field name="employee_code" placeholder="Employee Code" required="1"/>
+                        <field name="type_of_employee" required="1"/>
                     </group>
                 </group>
             </xpath>

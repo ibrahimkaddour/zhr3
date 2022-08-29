@@ -9,7 +9,8 @@
     'category': 'HR',
     'version': '1.0',
     'sequence': 20,
-    'depends': ['ahcec_hr_groups_configuration', 'mail', 'hr_fiscal_year', 'contacts'],
+    # 'depends': ['ahcec_hr_groups_configuration', 'mail', 'hr_fiscal_year', 'contacts'],
+    'depends': ['ahcec_hr_groups_configuration', 'mail', 'contacts'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

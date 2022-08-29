@@ -8,6 +8,14 @@ from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 class HrPayslip(models.Model):
     _inherit = "hr.payslip"
 
+    def action_payslip_draft(self):
+        res = super(HrPayslip, self).action_payslip_draft()
+        if self.move_ids:
+            for line in self.move_ids:
+                if line.state == 'draft':
+                    line.unlink()
+        return res
+
     @api.depends('contract_id')
     def check_signon_deduction(self):
         slip_obj = self.env['hr.payslip']
@@ -15,7 +23,7 @@ class HrPayslip(models.Model):
         employee_id = self.contract_id.employee_id
         date_of_leave = False
         if employee_id.date_of_leave:
-            date_of_leave = datetime.strptime(employee_id.date_of_leave, DEFAULT_SERVER_DATE_FORMAT).date()
+            date_of_leave = datetime.strptime(str(employee_id.date_of_leave), DEFAULT_SERVER_DATE_FORMAT).date()
         if date_of_leave and employee_id.date_of_leave and employee_id.duration_in_months < 13 and date_of_leave < datetime.now().date():
             for slip_id in slip_obj.search([('state', '=', 'done')]):
                 for slip_line_id in slip_id.line_ids:

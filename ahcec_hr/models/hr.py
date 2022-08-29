@@ -56,8 +56,9 @@ class HrEmployee(models.Model):
                 try:
                     join_date = datetime.strptime(str(employee.joining_date), DEFAULT_SERVER_DATE_FORMAT).date()
                     to_date = datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT)
-                    current_date = datetime.strptime(to_date, DEFAULT_SERVER_DATE_FORMAT)
-                    employee.duration_in_months = (current_date.year - join_date.year) * 12 + current_date.month - join_date.month
+                    current_date = datetime.strptime(str(to_date), DEFAULT_SERVER_DATE_FORMAT)
+                    employee.duration_in_months = (
+                                                              current_date.year - join_date.year) * 12 + current_date.month - join_date.month
                 except:
                     employee.duration_in_months = 0.0
             else:
@@ -67,9 +68,10 @@ class HrEmployee(models.Model):
     def _get_full_name(self):
         for rec in self:
             if rec.name and rec.middle_name and rec.grand_father_name and rec.last_name:
-                rec.full_name = "%s %s %s %s" % (rec.name or '', rec.middle_name or '', rec.grand_father_name or '', rec.last_name or '')
+                rec.full_name = "%s %s %s %s" % (
+                rec.name or '', rec.middle_name or '', rec.grand_father_name or '', rec.last_name or '')
             else:
-                rec.full_name = "%s %s %s" % (rec.name or '', rec.middle_name or '',  rec.last_name or '')
+                rec.full_name = "%s %s %s" % (rec.name or '', rec.middle_name or '', rec.last_name or '')
 
     @api.model
     def get_employee(self):
@@ -99,6 +101,10 @@ class HrEmployee(models.Model):
         return recs.name_get()
 
     # ================Fields of HR employee=======================
+    type_of_employee = fields.Selection(
+        [('employee', 'Employee'), ('operator', 'Operator')],
+        string='Employee Type', default='employee')
+
     arabic_name = fields.Char('Arabic Name', size=120)
     joining_date = fields.Date('Joining Date', track_visibility='onchange')
     date_of_leave = fields.Date('Leaving Date')
@@ -200,7 +206,7 @@ class HrEmployee(models.Model):
             for manager in self.env['hr.groups.configuration'].search([('hr_ids', '!=', False)]):
                 for employee in self.env['hr.employee'].search([('branch_id', '=', manager.branch_id.id)]):
                     diff = relativedelta(datetime.today(),
-                                         datetime.strptime(employee.birthday, DEFAULT_SERVER_DATE_FORMAT))
+                                         datetime.strptime(str(employee.birthday), DEFAULT_SERVER_DATE_FORMAT))
                     if diff and diff.years == 59 and diff.months == 6:
                         employees.append(employee.name)
                         employees.append(employee.employee_code)
@@ -254,7 +260,8 @@ class HrEmployee(models.Model):
 class HrGroupsConfiguration(models.Model):
     _inherit = "hr.groups.configuration"
 
-    branch_id = fields.Many2one('hr.branch', 'Office', required=True, default=lambda self: self.env['hr.branch']._default_branch())
+    branch_id = fields.Many2one('hr.branch', 'Office', required=True,
+                                default=lambda self: self.env['hr.branch']._default_branch())
 
     _sql_constraints = [
         ('unique_branch_id', 'unique(branch_id)', 'Office must be unique per Configuration!'),

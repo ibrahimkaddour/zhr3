@@ -21,6 +21,10 @@ class ResConfigSettings(models.TransientModel):
     vacation_accural_debit_pjt_account = fields.Many2one('account.account', 'Vacation Accrual Debit Account(Project)')
     vacation_accural_credit_pjt_account = fields.Many2one('account.account', 'Vacation Accrual Credit Account(Project)')
 
+    travel_accrual_journal_id = fields.Many2one('account.journal', string="Travel Accrual Journal")
+    vacation_journal_id = fields.Many2one('account.journal', string="Vacation Journal")
+    eos_journal_id = fields.Many2one('account.journal', string="EOS Journal")
+
     def set_values(self):
         super(ResConfigSettings, self).set_values()
         self.env['ir.config_parameter'].sudo().set_param('ticket_debit_account', self.ticket_accural_debit_account.id)
@@ -42,6 +46,13 @@ class ResConfigSettings(models.TransientModel):
                                                          self.vacation_accural_debit_pjt_account.id)
         self.env['ir.config_parameter'].sudo().set_param('vacation_credit_pjt_account',
                                                          self.vacation_accural_credit_pjt_account.id)
+
+        self.env['ir.config_parameter'].sudo().set_param('travel_accrual_journal_id',
+                                                         self.travel_accrual_journal_id.id)
+        self.env['ir.config_parameter'].sudo().set_param('vacation_journal_id',
+                                                         self.vacation_journal_id.id)
+        self.env['ir.config_parameter'].sudo().set_param('eos_journal_id',
+                                                         self.eos_journal_id.id)
 
     @api.model
     def get_values(self):
@@ -69,6 +80,13 @@ class ResConfigSettings(models.TransientModel):
                 self.env['ir.config_parameter'].sudo().get_param('vacation_debit_pjt_account')),
             vacation_accural_credit_pjt_account=int(
                 self.env['ir.config_parameter'].sudo().get_param('vacation_credit_pjt_account')),
+            travel_accrual_journal_id=int(
+                self.env['ir.config_parameter'].sudo().get_param('travel_accrual_journal_id')),
+            vacation_journal_id=int(
+                self.env['ir.config_parameter'].sudo().get_param('vacation_journal_id')),
+            eos_journal_id=int(
+                self.env['ir.config_parameter'].sudo().get_param('eos_journal_id')),
+
         )
         return res
 

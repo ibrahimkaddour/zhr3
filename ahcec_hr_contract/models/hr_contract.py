@@ -75,6 +75,9 @@ class HRContract(models.Model):
     total_yearly_cost = fields.Float('Total Yearly Cost', compute='_get_cost')
     ticket_total = fields.Float('Ticket Total', compute='_get_cost')
 
+    is_ticket_monthly = fields.Boolean(string="Ticket Monthly")
+    ticket_monthly = fields.Float(string='Value Of Ticket Monthly')
+
     @api.model
     def create(self, values):
         """
@@ -83,7 +86,7 @@ class HRContract(models.Model):
         if values.get('employee_id', False):
             employee = self.env['hr.employee'].browse(values['employee_id'])
             values.update({'job_id': employee.job_id.id or False})
-            contracts = employee.get_active_contracts(date=fields.Date.today())
+            # contracts = employee.get_active_contracts(date=fields.Date.today())
             # for cont in contracts:
             #     if cont.state in ('draft','open','pending'):
             #         raise UserError(_('Please close the active contracts of %s') % employee.name)
@@ -116,15 +119,33 @@ class HRContract(models.Model):
             contract.total_monthly_cost = contract.monthly_indirect_cost + contract.total_salary
             contract.total_yearly_cost = contract.total_monthly_cost * 12
 
-    @api.depends('wage', 'mobile_allowance', 'signon_bonus_amount', 'HRA', 'TA', 'other_allow', 'remote_allow')
+    @api.depends('wage', 'mobile_allowance', 'signon_bonus_amount', 'HRA',
+                 'TA', 'other_allow', 'remote_allow', 'ticket_monthly')
     def _get_total(self):
         for contract in self:
+            # total_salary = contract.wage
+            # if contract.mobile:
+            #     total_salary += contract.mobile_allowance
+            # if contract.signon_bonus:
+            #     total_salary += contract.signon_bonus_amount
+            # if contract.is_HRA:
+            #     total_salary += contract.HRA
+            # if contract.is_TA:
+            #     total_salary += contract.TA
+            # if contract.is_other_allow:
+            #     total_salary += contract.other_allow
+            # if contract.is_remote_allow:
+            #     total_salary += contract.remote_allow
+            # if contract.is_ticket_monthly:
+            #     total_salary += contract.ticket_monthly
+            # contract.total_salary = total_salary
             contract.total_salary = contract.wage + \
                                     contract.mobile_allowance + \
                                     contract.signon_bonus_amount + \
                                     contract.HRA + contract.TA + \
                                     contract.other_allow + \
-                                    contract.remote_allow
+                                    contract.remote_allow + \
+                                    contract.ticket_monthly
 
     @api.depends('is_vacation', 'total_salary')
     def _get_vacation(self):
@@ -166,19 +187,22 @@ class HRContract(models.Model):
     @api.depends()
     def _get_eos(self):
         for contract in self:
+            contract.today = fields.Date.today()
+            contract.total_days = 0
+            contract.eos_amount = 0
             if contract.employee_id.joining_date:
                 # join_date = datetime.strptime(contract.employee_id.joining_date, DEFAULT_SERVER_DATE_FORMAT)
                 join_date = datetime.strptime(str(contract.employee_id.joining_date), DEFAULT_SERVER_DATE_FORMAT)
-                contract.today = fields.Date.today()
+                # contract.today = fields.Date.today()
                 # leave_date = datetime.strptime(contract.today, DEFAULT_SERVER_DATE_FORMAT)
-                leave_date = datetime.strptime(str(contract.today), DEFAULT_SERVER_DATE_FORMAT)
+                leave_date = datetime.strptime(str(fields.Date.today()), DEFAULT_SERVER_DATE_FORMAT)
                 diff = relativedelta(leave_date, join_date)
                 duration_days = diff.days
                 duration_months = diff.months
                 duration_years = diff.years
                 from_date = datetime.strptime(str(contract.employee_id.joining_date), '%Y-%m-%d')
                 start = datetime.date(from_date)
-                end_date = datetime.strptime(str(contract.today), '%Y-%m-%d')
+                end_date = datetime.strptime(str(fields.Date.today()), '%Y-%m-%d')
                 end = datetime.date(end_date)
                 days = abs(end - start).days + 1
                 contract.total_days = days
@@ -198,6 +222,8 @@ class HRContract(models.Model):
                 else:
                     contract.eos_amount = (1825 * (contract.total_salary / 2) / 365) + (
                             ((days - 1825) * contract.total_salary) / 365)
+            else:
+                print('a')
 
     @api.depends('wage')
     def _get_amount(self):
@@ -221,10 +247,10 @@ class HRContract(models.Model):
     #         self.job_id = employee.job_id.id or False
     #         self.department_id = employee.department_id.id or False
 
-    # @api.onchange('insurance_id')
-    # def onchance_insurance_id(self):
-    #     for contract in self:
-    #         contract.insurance_cost = contract.insurance_id.insurance_amount
+    @api.onchange('insurance_id')
+    def onchance_insurance_id(self):
+        for contract in self:
+            contract.insurance_cost = contract.insurance_id.insurance_amount
 
     # =========================================
     # @api.onchange('mobile', 'employee_id')
@@ -261,7 +287,7 @@ class HRContract(models.Model):
                     template_id.write({'email_to': email_to, 'reply_to': email_to, 'auto_delete': False})
                     template_id.send_mail(contract.id, force_send=True)
                     contract.write({'state': 'pending'})
-                elif datetime.now().date() == datetime.strptime(contract.date_end, DEFAULT_SERVER_DATE_FORMAT).date():
+                elif datetime.now().date() == datetime.strptime(str(contract.date_end), DEFAULT_SERVER_DATE_FORMAT).date():
                     contract.write({'state': 'close'})
         return True
 

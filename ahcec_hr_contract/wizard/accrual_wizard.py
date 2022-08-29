@@ -3,7 +3,9 @@
 from odoo import models, api, _, fields
 from datetime import date as dt, datetime
 import calendar
-
+from odoo.exceptions import ValidationError
+import logging
+_logger = logging.getLogger(__name__)
 
 class AccrualWizard(models.TransientModel):
     _name = 'accrual.wizard'
@@ -32,13 +34,13 @@ class AccrualWizard(models.TransientModel):
             self.date_to = edate
 
     def get_timesheet(self, employee, date_from, date_to):
-        self.env.cr.execute("""SELECT sum(unit_amount) as hours,account_id FROM account_analytic_line
-                                                                   WHERE employee_id = %s and
-                                                                   date >= %s and
-                                                                   date <= %s and 
-                                                                   sheet_id is not Null
-                                                                   group by account_id
-                                                                        """, (
+        self.env.cr.execute("""
+        SELECT sum(unit_amount) as hours,account_id FROM account_analytic_line
+        WHERE employee_id = %s and
+        date >= %s and
+        date <= %s 
+        group by account_id
+            """, (
             employee, date_from, date_to,))
         data = self.env.cr.dictfetchall()
         return data
@@ -65,20 +67,30 @@ class AccrualWizard(models.TransientModel):
                         amount = cont.eos_amount
                         if cont.eos_accrual_move_id:
                             amount = amount - cont.eos_accrual_move_id.amount
+                        journal = int(self.env['ir.config_parameter'].sudo().get_param('eos_journal_id'))
+                        if not journal:
+                            raise ValidationError(_('Please go to config and put (EOS journal)'))
                         move = {
                             'name': '/',
-                            'journal_id': cont.company_id.accrual_journal.id,
+                            'journal_id': journal,
                             'date': self.date_to,
+                            'employee_id': self.employee_id.id
                         }
-                        debit_account = int(self.env['ir.config_parameter'].sudo().get_param('eos_debit_account'))
-                        credit_account = int(self.env['ir.config_parameter'].sudo().get_param('eos_credit_account'))
+                        if self.employee_id.type_of_employee == 'employee':
+                            debit_account = int(self.env['ir.config_parameter'].sudo().get_param('eos_debit_account'))
+                            credit_account = int(self.env['ir.config_parameter'].sudo().get_param('eos_credit_account'))
+                        elif self.employee_id.type_of_employee == 'operator':
+                            credit_account = int(self.env['ir.config_parameter'].sudo().get_param('eos_credit_pjt_account'))
+                            debit_account = int(self.env['ir.config_parameter'].sudo().get_param('eos_debit_pjt_account'))
+                        else:
+                            raise ValidationError('Please go to employee and put type of employee')
 
                         if debit_account and credit_account:
                             adjust_credit = (0, 0, {
                                 'name': cont.employee_id.name or '/ ' + 'EOS',
                                 'partner_id': cont.employee_id.address_home_id.id,
                                 'account_id': credit_account,
-                                'journal_id': cont.company_id.accrual_journal.id,
+                                'journal_id': journal,
                                 'date': self.date_to,
                                 'credit': amount,
                                 'debit': 0.0,
@@ -102,7 +114,7 @@ class AccrualWizard(models.TransientModel):
                                         'name': cont.employee_id.name or '/ ' + 'EOS Accrual',
                                         'partner_id': cont.employee_id.address_home_id.id,
                                         'account_id': debit_account,
-                                        'journal_id': cont.company_id.accrual_journal.id,
+                                        'journal_id': journal,
                                         'analytic_account_id': sheet.get('account_id') or False,
                                         'date': self.date_to,
                                         'debit': amt,
@@ -117,7 +129,7 @@ class AccrualWizard(models.TransientModel):
                                     'name': cont.employee_id.name or '/ ' + 'EOS Accrual',
                                     'partner_id': cont.employee_id.address_home_id.id,
                                     'account_id': debit_account,
-                                    'journal_id': cont.company_id.accrual_journal.id,
+                                    'journal_id': journal,
                                     'analytic_account_id': cont.analytic_account_id.id or False,
                                     'date': self.date_to,
                                     'debit': abs(amount),
@@ -136,21 +148,33 @@ class AccrualWizard(models.TransientModel):
                                 'type': 'eos',
                             }
                             self.env['employee.accrual.move'].sudo().create(accrual)
+
                     if cont.is_vacation:
                         line_ids = []
-                        date = datetime.strptime(self.date_to, '%Y-%m-%d')
+                        date = datetime.strptime(str(self.date_to), '%Y-%m-%d')
                         month_days = calendar.monthrange(date.year, date.month)[1]
                         amount = ((cont.vacation / 12) / 30) * month_days
+                        journal = int(self.env['ir.config_parameter'].sudo().get_param('vacation_journal_id'))
+                        if not journal:
+                            raise ValidationError(_('Please go to config and put (Vacation journal)'))
+                        _logger.critical('===== VACATION =====')
 
                         move = {
                             'name': '/',
-                            'journal_id': cont.company_id.accrual_journal.id,
+                            'journal_id': journal,
                             'date': self.date_to,
+                            'employee_id': cont.employee_id.id
                         }
-
-                        debit_account = int(self.env['ir.config_parameter'].sudo().get_param('vacation_debit_account'))
-                        credit_account = int(
-                            self.env['ir.config_parameter'].sudo().get_param('vacation_credit_account'))
+                        if self.employee_id.type_of_employee == 'employee':
+                            debit_account = int(
+                                self.env['ir.config_parameter'].sudo().get_param('vacation_debit_account'))
+                            credit_account = int(
+                                self.env['ir.config_parameter'].sudo().get_param('vacation_credit_account'))
+                        elif self.employee_id.type_of_employee == 'operator':
+                            credit_account = int(self.env['ir.config_parameter'].sudo().get_param('vacation_credit_pjt_account'))
+                            debit_account = int(self.env['ir.config_parameter'].sudo().get_param('vacation_debit_pjt_account'))
+                        else:
+                            raise ValidationError('Please go to employee and put type of employee')
 
                         if debit_account and credit_account:
                             adjust_credit = (0, 0, {
@@ -216,7 +240,7 @@ class AccrualWizard(models.TransientModel):
 
                     if cont.air_allowance:
                         line_ids = []
-                        date = datetime.strptime(self.date_to, '%Y-%m-%d')
+                        date = datetime.strptime(str(self.date_to), '%Y-%m-%d')
                         month_days = calendar.monthrange(date.year, date.month)[1]
                         amount = ((cont.ticket_total / 12) / 30) * month_days
 
