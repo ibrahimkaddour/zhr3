@@ -71,31 +71,31 @@ class HrPayslip(models.Model):
         #     self.input_line_ids = input_line_ids
         return res
 
-    def onchange_employee_id(self, date_from, date_to, employee_id=False, contract_id=False):
-        res = super(HrPayslip, self).onchange_employee_id(date_from, date_to, employee_id, contract_id)
-        self['value'].update({'bank_account_id': False})
-        contract_obj = self.env['hr.contract']
-        if employee_id:
-            employee = self.env['hr.employee'].search([('id', '=', employee_id)])
-            self['value'].update({
-                'bank_account_id': employee.bank_account_id and employee.bank_account_id.id or False,
-                'employee_id': employee.id
-            })
-            self.update({'domain': {
-                'bank_account_id': [('id', '=', employee.bank_account_id and employee.bank_account_id.id or False)]}})
-        if self['value']['contract_id']:
-            result = self.get_worked_day_lines(contract_obj.browse(res['value']['contract_id']), date_from, date_to)
-            # Note : We have apped result on base method
-            worked_days_line_ids = result
-            # leave_summary = leave_result[1]
-            input_line_ids = self.get_inputs(contract_obj.browse(res['value']['contract_id']), date_from, date_to)
-            self['value'].update({
-                'worked_days_line_ids': worked_days_line_ids,
-                'input_line_ids': input_line_ids,
-                'date_from': date_from,
-                'date_to': date_to,
-            })
-        return True
+#     def onchange_employee_id(self, date_from, date_to, employee_id=False, contract_id=False):
+#         res = super(HrPayslip, self).onchange_employee_id(date_from, date_to, employee_id, contract_id)
+#         self['value'].update({'bank_account_id': False})
+#         contract_obj = self.env['hr.contract']
+#         if employee_id:
+#             employee = self.env['hr.employee'].search([('id', '=', employee_id)])
+#             self['value'].update({
+#                 'bank_account_id': employee.bank_account_id and employee.bank_account_id.id or False,
+#                 'employee_id': employee.id
+#             })
+#             self.update({'domain': {
+#                 'bank_account_id': [('id', '=', employee.bank_account_id and employee.bank_account_id.id or False)]}})
+#         if self['value']['contract_id']:
+#             result = self.get_worked_day_lines(contract_obj.browse(res['value']['contract_id']), date_from, date_to)
+#             # Note : We have apped result on base method
+#             worked_days_line_ids = result
+#             # leave_summary = leave_result[1]
+#             input_line_ids = self.get_inputs(contract_obj.browse(res['value']['contract_id']), date_from, date_to)
+#             self['value'].update({
+#                 'worked_days_line_ids': worked_days_line_ids,
+#                 'input_line_ids': input_line_ids,
+#                 'date_from': date_from,
+#                 'date_to': date_to,
+#             })
+#         return True
 
     # def compute_sheet(self):
     #     res = super(HrPayslip, self).compute_sheet()
